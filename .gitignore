@@ -1,0 +1,10 @@
+output
+.stencil/
+.idea/
+.vscode/
+.sass-cache/
+.versions/
+node_modules/
+package
+
+DMI_House.glb
