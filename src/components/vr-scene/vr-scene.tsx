@@ -307,24 +307,26 @@ export class VrScene {
   }
 
   lookAt(camera, animationCamera, vector) {
-    const initialRotation = {...animationCamera.getAttribute('rotation')};
-    let angle = initialRotation.y % 360;
-
-    // force it to be the positive remainder, so that 0 <= angle < 360
-    angle = (angle + 360) % 360;
-
-    // force into the minimum absolute value residue class, so that -180 < angle <= 180
-    if (angle > 180) angle -= 360;
-
-    initialRotation.y = angle;
-
+    const initialRotation = Object.assign({}, animationCamera.getAttribute('rotation'));
     animationCamera.object3D.lookAt(vector);
+    const targetRotation = animationCamera.getAttribute('rotation');
 
-    let targetRotation = animationCamera.getAttribute('rotation');
+    // Calculate the difference in rotation angles for y-axis
+    let deltaY = targetRotation.y - initialRotation.y;
 
-    camera.setAttribute('rotation', initialRotation);
+    // Adjust the difference to ensure it takes the shortest path
+    if (deltaY > 180) {
+      deltaY -= 360;
+    } else if (deltaY < -180) {
+      deltaY += 360;
+    }
+
+    // Apply the adjusted rotation to the initial rotation
     animationCamera.setAttribute('rotation', initialRotation);
-    animationCamera.setAttribute('animation__rot', `property: rotation; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${targetRotation.x} ${targetRotation.y} 0`);
+    camera.setAttribute('rotation', initialRotation);
+
+    // Animate the rotation to the adjusted target rotation
+    animationCamera.setAttribute('animation__rot', `property: rotation; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${targetRotation.x} ${initialRotation.y + deltaY} 0`);
   }
 
   viewItem(itemId, itemSeized) {
