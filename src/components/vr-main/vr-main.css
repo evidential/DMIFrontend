@@ -59,12 +59,12 @@ model-viewer {
     position: absolute;
     left: 20px;
     bottom: 0;
-    width: 20vh;
+    width: 17vh;
     z-index: 1;
 }
 
 .environment-link-name {
-    font-size: 3vh;
+    font-size: 2.5vh;
     font-weight: bold;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     margin: 0 0 5px;
@@ -278,6 +278,7 @@ model-viewer {
 }
 
 .effect-rotateleft.animate .outer-nav {
+    overflow: scroll;
     pointer-events: all;
 }
 
@@ -332,7 +333,6 @@ ion-toast {
 .seizable-item-card.active-item ion-card-content {
     display: flex;
     flex-direction: column;
-    padding: 5px 13px;
     align-items: center;
 }
 
@@ -340,7 +340,7 @@ ion-toast {
     background-image: url('../assets/images/seized.png');
     background-size: 85%;
     background-repeat: no-repeat;
-    background-position: 50%;
+    background-position: 50% 0;
     content: '';
     z-index: 1;
     position: absolute;
@@ -348,6 +348,11 @@ ion-toast {
     right: 0;
     top: 0;
     bottom: 0;
+}
+
+.seizable-item-card ion-card > img {
+    height: 100px;
+    width: 100%;
 }
 
 .seizable-item-card.active-item img.active-item-image {

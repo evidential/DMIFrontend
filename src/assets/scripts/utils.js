@@ -12,3 +12,7 @@ export function debounce(func, wait, immediate) {
 		if (callNow) func.apply(context, args);
 	};
 };
+
+export function replaceSpacesWithUnderscores(inputString) {
+	return inputString.replace(/ /g, '_');
+}

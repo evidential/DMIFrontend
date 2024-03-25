@@ -161,7 +161,6 @@ export class VrMain {
 
   SeizableListItem = (props: { item }) => (
       <ion-item class={`seizable-item ${props.item.seized === true && 'seized'}`}
-                button
                 lines="full">
         <ion-thumbnail>
           <img alt={props.item.name} src={`${this.fileServerPath}/images/${props.item.image}`}/>

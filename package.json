@@ -1,8 +1,8 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "DMI Tablet",
     "app-name": "DMI Tablet",
-    "package-name": "webview",
+    "package-name": "dmitabletmanager",
     "project-type": "webview",
     "project-name": "DMI Tablet",
     "screenOrientation": "landscape",

@@ -1,8 +1,9 @@
 import {Component, State, h, Element, Prop, Watch, Event, EventEmitter, Method} from '@stencil/core';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {config} from "../../config";
-import {debounce} from "../../assets/scripts/utils";
+import {debounce, replaceSpacesWithUnderscores} from "../../assets/scripts/utils";
 
 declare const front;
 declare const AFRAME;
@@ -74,6 +75,12 @@ export class VrScene {
       //if (this.viewingItem === true) this.backToScene(false);
       setTimeout(() => {
         this.viewItem(itemData.ItemNumber, true);
+      }, 100);
+    }, 200, true));
+
+    front.on('item unseized', debounce(itemData => {
+      setTimeout(() => {
+        this.itemUnseized(itemData.ItemNumber);
       }, 100);
     }, 200, true));
   }
@@ -173,6 +180,10 @@ export class VrScene {
     const environmentLoadingEl = this.el.querySelector('.environment-loading');
     const initialisingEl = this.el.querySelector('.initialising-hidden');
     const loader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath(`${this.fileServerPath}/scripts/draco/gltf/`);
+
+    loader.setDRACOLoader(dracoLoader);
 
     const promises: Promise<void>[] = config.environments.map(environment => {
       return new Promise<void>((resolve, reject) => {
@@ -259,7 +270,8 @@ export class VrScene {
 
   getItemPosition(animationCamera, targetObject) {
     const entityPosition = new THREE.Vector3();
-    targetObject.getObject3D('mesh').children[0].getWorldPosition(entityPosition);
+    //targetObject.getObject3D('mesh').children[0].getWorldPosition(entityPosition);
+    targetObject.getWorldPosition(entityPosition);
 
     const cameraPosition = new THREE.Vector3();
     animationCamera.object3D.getWorldPosition(cameraPosition);
@@ -276,7 +288,7 @@ export class VrScene {
   dollyTo(animationRig, target) {
     // Calculate the direction vector from the animation camera to the target
     const direction = new THREE.Vector3();
-    target.getObject3D('mesh').children[0].getWorldPosition(direction);
+    target.getWorldPosition(direction);
     direction.sub(animationRig.object3D.getWorldPosition(new THREE.Vector3()));
 
     // Calculate the up vector
@@ -285,8 +297,8 @@ export class VrScene {
 
     // Calculate the destination position for the camera
     const destination = new THREE.Vector3();
-    destination.copy(target.getObject3D('mesh').children[0].getWorldPosition(new THREE.Vector3()));
-    destination.add(direction.normalize().multiplyScalar(-0.2));
+    destination.copy(target.getWorldPosition(new THREE.Vector3()));
+    destination.add(direction.normalize().multiplyScalar(-0.3));
     destination.add(up.multiplyScalar(-0.1));
 
     animationRig.setAttribute('animation__pos', `property: position; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${destination.x} ${destination.y} ${destination.z}`);
@@ -331,11 +343,12 @@ export class VrScene {
 
   viewItem(itemId, itemSeized) {
     const seizableItem = config.seizableItems.find(item => item.id === itemId);
+    const glbMeshID = seizableItem.glbID;
     const itemName = seizableItem.name;
     const itemInfo = seizableItem.info;
     const activeItem = this.el.querySelector('.active-item');
     const seizableItemList = this.el.querySelector('.seizable-item-list');
-    const itemEntity = this.el.querySelector(`#seizableItem${itemId}`);
+    const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
 
     this.activeItemSeized = seizableItem.seized;
     this.activeItemName = itemName;
@@ -349,6 +362,9 @@ export class VrScene {
 
     if (itemSeized === true) {
       seizableItem.seized = true;
+      this.activeItemSeized = true;
+
+      this.highlightSeizedItem(itemMesh, true);
 
       this.itemSeized.emit({
         seizedItem: seizableItem,
@@ -357,7 +373,7 @@ export class VrScene {
     }
 
     setTimeout(() => {
-      this.moveCameraToItem(itemEntity);
+      this.moveCameraToItem(itemMesh);
 
       if (this.viewingItem === false) {
         this.viewingItem = !this.viewingItem;
@@ -368,6 +384,29 @@ export class VrScene {
         this.toggleItemOverlay();
       }
     }, 100);
+  }
+
+  itemUnseized(itemId) {
+    const seizedItem = config.seizableItems.find(item => item.id === itemId);
+    const glbMeshID = seizedItem.glbID;
+    const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
+    const itemName = seizedItem.name;
+
+    seizedItem.seized = false;
+
+    this.highlightSeizedItem(itemMesh, false);
+
+    this.activeItemSeized = false;
+    this.environmentSeizableItemList = [...this.environmentSeizableItemList];
+
+    this.itemSeized.emit({
+      seizedItem,
+      message: `${itemName} unseized from ${config.environments[this.userEnvironment].name}`
+    });
+  }
+
+  highlightSeizedItem(itemEntity, seized) {
+    console.log(itemEntity, seized);
   }
 
   backToScene(animate: boolean) {
@@ -474,31 +513,12 @@ export class VrScene {
 
           <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
             <a-assets>
+              <a-asset-item id="sceneModel" src={`${this.fileServerPath}/models/House.glb`}></a-asset-item>
               <img id="sky" src={`${this.fileServerPath}/images/skybox-night.png`}/>
-              <a-asset-item id="sceneModel" src={`${this.fileServerPath}/models/DMI_House.glb`}></a-asset-item>
-              <a-asset-item id="item0" src={`${this.fileServerPath}/models/${config.seizableItems[0].model}`}></a-asset-item>
-              <a-asset-item id="item1" src={`${this.fileServerPath}/models/${config.seizableItems[1].model}`}></a-asset-item>
-              <a-asset-item id="item2" src={`${this.fileServerPath}/models/${config.seizableItems[2].model}`}></a-asset-item>
             </a-assets>
 
             <a-entity light="type: ambient; color: #BBB; intensity: 0.7;"></a-entity>
             <a-entity light="type: directional; color: #fff; intensity: 1.0" position="-56 35 -1"></a-entity>
-
-            <a-entity id="environmentLight1" light="type: point; intensity: 1.5; distance: 50; decay: 1; color: #fff"
-                      position="2.621, 1.410, -8.391"></a-entity>
-            <a-entity id="environmentLight2" light="type: point; intensity: 2; distance: 50; decay: 1; color: #fff"
-                      position="2.849, 1.291, 4.161"></a-entity>
-            <a-entity id="environmentLight3" light="type: point; intensity: 2; distance: 50; decay: 1; color: #fff"
-                      position="2.849, 1.291, 4.920"></a-entity>
-            <a-entity id="environmentLight4" light="type: point; intensity: 1.5; distance: 50; decay: 1; color: #fff"
-                      position="8.598, 2.565, 3.704"></a-entity>
-            <a-entity id="environmentLight5" light="type: point; intensity: 1; distance: 50; decay: 1; color: #ffee99"
-                      position="0.459, 1.291, 6.871"></a-entity>
-
-            {this.sceneReady &&
-                [ <a-entity id="seizableItem0" gltf-model="#item0"></a-entity>,
-                  <a-entity id="seizableItem1" gltf-model="#item1"></a-entity>,
-                  <a-entity id="seizableItem2" gltf-model="#item2"></a-entity>]}
 
             <a-sky class="skybox" src="#sky"></a-sky>
             <a-entity id="rig" position={this.cameraPosition} rotation="0 5 0">

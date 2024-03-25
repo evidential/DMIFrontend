@@ -18,6 +18,12 @@ function startSocketServer(socketServerPort, back) {
 			back.send('item seized', JSON.parse(data));
 		});
 
+		socket.on('ItemUnseized', data => {
+			console.log('ItemUnseized: ', JSON.parse(data));
+
+			back.send('item unseized', JSON.parse(data));
+		});
+
 		socket.on('TeleportedToArea', data => {
 			console.log('Area: ', JSON.parse(data));
 
