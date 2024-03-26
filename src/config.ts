@@ -73,13 +73,13 @@ const config =  {
       id: 4,
       name: 'Bathroom',
       cameraPosition: {
-        x: -3.064,
+        x: -3.427,
         y: 4.34,
-        z: -0.147
+        z: 0.136
       },
       cameraRotation: {
-        x: -33,
-        y: 28,
+        x: -19,
+        y: -3.6,
         z: 0
       },
       model: '',
@@ -111,15 +111,8 @@ const config =  {
       name: 'Amazon Echo Show',
       info: 'Amazon Echo Show 10.',
       image: 'item0.png',
-      seized: false
-    },
-    {
-      id: 1,
-      glbID: 'Amazon_Ordering_Device_Holder',
-      name: 'Device Holder',
-      info: 'Amazon_Ordering Device Holder.',
-      image: 'item1.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 2,
@@ -127,7 +120,8 @@ const config =  {
       name: 'Air Tracker',
       info: 'Apple Air Tag Box.',
       image: 'item2.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 3,
@@ -135,7 +129,8 @@ const config =  {
       name: 'Macbook',
       info: 'Apple Macbook Laptop.',
       image: 'item3.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 4,
@@ -143,7 +138,8 @@ const config =  {
       name: 'Black Watch',
       info: 'Black Apple Watch.',
       image: 'item4.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 5,
@@ -151,7 +147,8 @@ const config =  {
       name: 'Grey Watch',
       info: 'Grey Apple Watch.',
       image: 'item5.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 6,
@@ -159,7 +156,8 @@ const config =  {
       name: 'USB Sticks',
       info: 'Bag_of USB Sticks.',
       image: 'item6.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 7,
@@ -167,7 +165,8 @@ const config =  {
       name: 'Power Bank',
       info: 'Black Power Bank.',
       image: 'item7.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 8,
@@ -175,7 +174,11 @@ const config =  {
       name: 'Book By Robert Louis Stevenson',
       info: 'Dr Jekyll & Mr Hyde.',
       image: 'item8.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -0.6,
+        up: -0.3
+      }
     },
     {
       id: 9,
@@ -183,7 +186,8 @@ const config =  {
       name: 'BT Router',
       info: 'Type A BT Router Hub 6.',
       image: 'item9.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 10,
@@ -191,7 +195,11 @@ const config =  {
       name: 'Burglar Alarms',
       info: 'Burglar Alarms.',
       image: 'item10.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -0.5,
+        up: 0.2
+      }
     },
     {
       id: 11,
@@ -199,7 +207,11 @@ const config =  {
       name: 'Computer System',
       info: 'Computer System.',
       image: 'item11.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -0.6,
+        up: -0.2
+      }
     },
     {
       id: 12,
@@ -207,7 +219,8 @@ const config =  {
       name: 'Wifi Camera',
       info: 'D Link Wifi Camera.',
       image: 'item12.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 13,
@@ -215,7 +228,8 @@ const config =  {
       name: 'D Link Router',
       info: 'D Link Wifi Router',
       image: 'item13.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 14,
@@ -223,7 +237,8 @@ const config =  {
       name: 'Drone Controller',
       info: 'DJI Mavic Pro Drone Controller',
       image: 'item14.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 15,
@@ -231,7 +246,8 @@ const config =  {
       name: 'Drone',
       info: 'DJI Mavic Pro Drone',
       image: 'item15.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 16,
@@ -239,7 +255,8 @@ const config =  {
       name: 'Mini Drone Controller',
       info: 'DJI Mini Pro_3 Drone Controller.',
       image: 'item16.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 17,
@@ -247,7 +264,8 @@ const config =  {
       name: 'Mini Drone',
       info: 'DJI Mini Pro 3 Drone.',
       image: 'item17.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 18,
@@ -255,7 +273,8 @@ const config =  {
       name: 'Phantom Drone Controller',
       info: 'DJI Phantom 2 Drone Controller.',
       image: 'item18.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 19,
@@ -263,7 +282,8 @@ const config =  {
       name: 'Phantom Drone',
       info: 'DJI_Phantom_2_Drone.',
       image: 'item19.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 20,
@@ -271,7 +291,8 @@ const config =  {
       name: 'Multi Tool',
       info: 'Dremel Multi Tool.',
       image: 'item20.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 21,
@@ -279,7 +300,8 @@ const config =  {
       name: 'Echo Dot',
       info: 'Echo Dot Device.',
       image: 'item21.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 22,
@@ -287,7 +309,8 @@ const config =  {
       name: 'EE MiFi Box',
       info: 'Yellow EE Mobile WiFi Hotspot Device.',
       image: 'item22.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 23,
@@ -295,7 +318,8 @@ const config =  {
       name: 'External HardDrive',
       info: 'External HardDrive',
       image: 'item23.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 24,
@@ -303,7 +327,8 @@ const config =  {
       name: 'Giles Kit',
       info: 'Giles Kit',
       image: 'item24.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 25,
@@ -311,7 +336,8 @@ const config =  {
       name: 'Internal HardDrive 1',
       info: 'Internal HardDrive 1',
       image: 'item25.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 26,
@@ -319,7 +345,8 @@ const config =  {
       name: 'Internal HardDrive 2',
       info: 'Internal HardDrive 2',
       image: 'item25.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 27,
@@ -327,7 +354,8 @@ const config =  {
       name: 'Internal HardDrive 3',
       info: 'Internal HardDrive 3',
       image: 'item25.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 28,
@@ -335,7 +363,8 @@ const config =  {
       name: 'Iphone',
       info: 'Iphone 14 Pro',
       image: 'item28.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 29,
@@ -343,7 +372,8 @@ const config =  {
       name: 'Amazon Kindle',
       info: 'Amazon Kindle Tablet',
       image: 'item29.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 30,
@@ -351,7 +381,11 @@ const config =  {
       name: 'Land Rover',
       info: 'Land Rover Discovery Sport',
       image: 'item30.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -3,
+        up: -0.5
+      }
     },
     {
       id: 31,
@@ -359,7 +393,8 @@ const config =  {
       name: 'Laptop 1',
       info: 'Laptop 1',
       image: 'item31.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 32,
@@ -367,7 +402,8 @@ const config =  {
       name: 'Laptop 2',
       info: 'Laptop 2',
       image: 'item31.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 33,
@@ -375,7 +411,8 @@ const config =  {
       name: 'Laptop 3',
       info: 'Laptop 3',
       image: 'item31.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 34,
@@ -383,7 +420,8 @@ const config =  {
       name: 'Laptop 4',
       info: 'Laptop 4',
       image: 'item31.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 35,
@@ -391,7 +429,8 @@ const config =  {
       name: 'Laptop 5',
       info: 'Laptop 5',
       image: 'item31.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 36,
@@ -399,7 +438,11 @@ const config =  {
       name: 'Smart Fridge',
       info: 'LG Smart Fridge',
       image: 'item36.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -1,
+        up: -1.5
+      }
     },
     {
       id: 37,
@@ -407,7 +450,8 @@ const config =  {
       name: 'Licence Plate Front',
       info: 'Licence Plate Front',
       image: 'item37.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 38,
@@ -415,7 +459,8 @@ const config =  {
       name: 'Licence Plate Rear',
       info: 'Licence Plate Rear',
       image: 'item38.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 39,
@@ -423,7 +468,8 @@ const config =  {
       name: 'Drone Case',
       info: 'Mavic Pro Drone Case',
       image: 'item39.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 40,
@@ -431,23 +477,26 @@ const config =  {
       name: 'Nintendo Switch',
       info: 'Nintendo Switch Game Console',
       image: 'item40.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 41,
-      glbID: 'Amazon_Echo_Show_10',
+      glbID: 'Nokia_101',
       name: 'Nokia 101',
       info: 'Nokia 101 Phone',
       image: 'item41.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 42,
-      glbID: 'Nokia_101',
+      glbID: 'Nokia_6300',
       name: 'Nokia Phone 6300',
       info: 'Nokia Phone 6300',
       image: 'item42.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 43,
@@ -455,7 +504,8 @@ const config =  {
       name: 'Notepad',
       info: 'Notepad Digits',
       image: 'item43.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 44,
@@ -463,7 +513,11 @@ const config =  {
       name: 'Post It Note',
       info: 'Post It Note',
       image: 'item44.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -0.1,
+        up: -0.1
+      }
     },
     {
       id: 45,
@@ -471,7 +525,8 @@ const config =  {
       name: 'PS4 Pro',
       info: 'PlayStation 4 Pro Games Console',
       image: 'item45.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 46,
@@ -479,7 +534,8 @@ const config =  {
       name: 'Cased Rasberry Pie',
       info: 'Cased Rasberry Pie',
       image: 'item46.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 47,
@@ -487,7 +543,8 @@ const config =  {
       name: 'Rasberry Pie',
       info: 'Rasberry Pie',
       image: 'item47.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 48,
@@ -495,7 +552,8 @@ const config =  {
       name: 'Ring Doorbell',
       info: 'Ring Doorbell',
       image: 'item48.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 49,
@@ -503,7 +561,8 @@ const config =  {
       name: 'Router Box',
       info: 'Router Box',
       image: 'item49.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 50,
@@ -511,7 +570,8 @@ const config =  {
       name: 'Samsung Phone',
       info: 'Samsung Galaxy Z Flip 4',
       image: 'item50.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 51,
@@ -519,7 +579,8 @@ const config =  {
       name: 'Samsung Watch',
       info: 'Samsung Gear S3 Watch',
       image: 'item51.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 52,
@@ -527,7 +588,8 @@ const config =  {
       name: 'Smart Cameras',
       info: 'Smart Cameras',
       image: 'item52.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 53,
@@ -535,7 +597,8 @@ const config =  {
       name: 'Smart Tag',
       info: 'Smart Tag',
       image: 'item53.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 54,
@@ -543,7 +606,8 @@ const config =  {
       name: 'Tesla Access Card',
       info: 'Tesla Access Card',
       image: 'item54.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 55,
@@ -551,7 +615,11 @@ const config =  {
       name: 'Tesla',
       info: 'Tesla Car',
       image: 'item55.png',
-      seized: false
+      seized: false,
+      cameraOverrides: {
+        depth: -3,
+        up: -0.3
+      }
     },
     {
       id: 56,
@@ -559,7 +627,8 @@ const config =  {
       name: 'TK Star Tracker',
       info: 'TK Star GPS Tracker Tracker Box.',
       image: 'item56.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 57,
@@ -567,7 +636,8 @@ const config =  {
       name: 'Crypto Wallet',
       info: 'Trezor Crypto Wallet',
       image: 'item57.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 58,
@@ -575,7 +645,8 @@ const config =  {
       name: 'USB_Stick 1',
       info: 'USB_Stick 1',
       image: 'item58.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 59,
@@ -583,7 +654,8 @@ const config =  {
       name: 'USB_Stick 2',
       info: 'USB_Stick 2',
       image: 'item58.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 60,
@@ -591,7 +663,8 @@ const config =  {
       name: 'USB_Stick 3',
       info: 'USB_Stick 3',
       image: 'item58.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 61,
@@ -599,7 +672,8 @@ const config =  {
       name: 'USB_Stick 4',
       info: 'USB_Stick 4',
       image: 'item58.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 64,
@@ -607,7 +681,8 @@ const config =  {
       name: 'Cloud Device',
       info: 'WD Personal Cloud Device',
       image: 'item63.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 65,
@@ -615,7 +690,8 @@ const config =  {
       name: 'Vodafone Mifi Box',
       info: 'White Vodafone Mifi Box',
       image: 'item64.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 66,
@@ -623,7 +699,8 @@ const config =  {
       name: 'Watch Charger',
       info: 'Wireless Watch Charger',
       image: 'item65.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     },
     {
       id: 67,
@@ -631,7 +708,8 @@ const config =  {
       name: 'Xbox Games Console',
       info: 'Xbox Series S Games Console',
       image: 'item66.png',
-      seized: false
+      seized: false,
+      cameraOverrides: null
     }
   ]
 };

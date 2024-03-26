@@ -238,7 +238,7 @@ export class VrScene {
     }
   }
 
-  moveCameraToItem(item) {
+  moveCameraToItem(item, cameraOverrides) {
     const animationRig: any = this.el.querySelector('#animationRig');
     const camera: any = this.el.querySelector('#camera');
     const animationCamera: any = this.el.querySelector('#animationCamera');
@@ -265,7 +265,7 @@ export class VrScene {
     this.backButtonTimeout = setTimeout(() => backButton.setAttribute('disabled', 'false'), this.itemAnimationDuration);
 
     this.lookAt(camera, animationCamera, itemTarget);
-    this.dollyTo(animationRig, item);
+    this.dollyTo(animationRig, item, cameraOverrides);
   }
 
   getItemPosition(animationCamera, targetObject) {
@@ -285,7 +285,14 @@ export class VrScene {
     return vector;
   }
 
-  dollyTo(animationRig, target) {
+  dollyTo(animationRig, target, cameraOverrides) {
+    let depthScalar = -0.3;
+    let upScalar = -0.1;
+    if (cameraOverrides !== null) {
+      depthScalar = cameraOverrides.depth;
+      upScalar = cameraOverrides.up;
+    }
+
     // Calculate the direction vector from the animation camera to the target
     const direction = new THREE.Vector3();
     target.getWorldPosition(direction);
@@ -298,12 +305,11 @@ export class VrScene {
     // Calculate the destination position for the camera
     const destination = new THREE.Vector3();
     destination.copy(target.getWorldPosition(new THREE.Vector3()));
-    destination.add(direction.normalize().multiplyScalar(-0.3));
-    destination.add(up.multiplyScalar(-0.1));
+    destination.add(direction.normalize().multiplyScalar(depthScalar));
+    destination.add(up.multiplyScalar(upScalar));
 
     animationRig.setAttribute('animation__pos', `property: position; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${destination.x} ${destination.y} ${destination.z}`);
   }
-
 
   dollyBack(animationRig, target) {
     // Calculate the direction vector from the animation camera to the target
@@ -346,6 +352,7 @@ export class VrScene {
     const glbMeshID = seizableItem.glbID;
     const itemName = seizableItem.name;
     const itemInfo = seizableItem.info;
+    const cameraOverrides = seizableItem.cameraOverrides;
     const activeItem = this.el.querySelector('.active-item');
     const seizableItemList = this.el.querySelector('.seizable-item-list');
     const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
@@ -373,7 +380,7 @@ export class VrScene {
     }
 
     setTimeout(() => {
-      this.moveCameraToItem(itemMesh);
+      this.moveCameraToItem(itemMesh, cameraOverrides);
 
       if (this.viewingItem === false) {
         this.viewingItem = !this.viewingItem;
