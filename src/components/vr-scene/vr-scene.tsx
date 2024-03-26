@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {config} from "../../config";
 import {debounce, replaceSpacesWithUnderscores} from "../../assets/scripts/utils";
+import { cloneDeep } from 'lodash';
 
 declare const front;
 declare const AFRAME;
@@ -64,7 +65,7 @@ export class VrScene {
   }
 
   async componentWillLoad() {
-    this.seizableItemList = config.seizableItems;
+    this.seizableItemList = cloneDeep(config.seizableItems);
     this.updateEnvironmentItems(0);
   }
 
@@ -72,7 +73,6 @@ export class VrScene {
     this.initialiseAFrameComponents();
 
     front.on('item seized', debounce(itemData => {
-      //if (this.viewingItem === true) this.backToScene(false);
       setTimeout(() => {
         this.viewItem(itemData.ItemNumber, true);
       }, 100);
@@ -87,19 +87,10 @@ export class VrScene {
 
   @Method()
   async resetScene() {
-    const scene = this.el.querySelector('a-scene');
     const activeItem = this.el.querySelector('.active-item');
     const seizableItemList = this.el.querySelector('.seizable-item-list');
-    this.environmentSeizableItemList = [];
-    this.seizableItemList.forEach(markerData => {
-      const deletedMarkerID = markerData.MarkerNumber;
-      const existingMarker = this.el.querySelector(`#marker${deletedMarkerID}`);
-      if (existingMarker === null) return;
-
-      // Remove the entity from the A-Frame scene
-      scene.removeChild(existingMarker);
-    });
-    this.seizableItemList = [];
+    this.seizableItemList = cloneDeep(config.seizableItems);
+    this.updateEnvironmentItems(0);
 
     if (this.viewingItem === true) {
       this.viewingItem = false;
@@ -121,8 +112,7 @@ export class VrScene {
 
   updateEnvironmentItems(environmentIndex: number) {
     const seizableItemsIds = config.environments.find(environment => environment.id === environmentIndex).seizableItems;
-    this.environmentSeizableItemList = config.seizableItems.filter(item => seizableItemsIds.includes(item.id));
-    console.log(this.environmentSeizableItemList);
+    this.environmentSeizableItemList = this.seizableItemList.filter(item => seizableItemsIds.includes(item.id));
   }
 
   setCamera(environmentIndex: number) {
@@ -348,7 +338,7 @@ export class VrScene {
   }
 
   viewItem(itemId, itemSeized) {
-    const seizableItem = config.seizableItems.find(item => item.id === itemId);
+    const seizableItem = this.seizableItemList.find(item => item.id === itemId);
     const glbMeshID = seizableItem.glbID;
     const itemName = seizableItem.name;
     const itemInfo = seizableItem.info;
@@ -394,7 +384,7 @@ export class VrScene {
   }
 
   itemUnseized(itemId) {
-    const seizedItem = config.seizableItems.find(item => item.id === itemId);
+    const seizedItem = this.seizableItemList.find(item => item.id === itemId);
     const glbMeshID = seizedItem.glbID;
     const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
     const itemName = seizedItem.name;

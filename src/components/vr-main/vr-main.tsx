@@ -2,6 +2,7 @@ import {Component, State, h, Element, Listen} from '@stencil/core';
 import {toastController} from "@ionic/core";
 import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
+import { cloneDeep } from 'lodash';
 
 declare const front;
 
@@ -12,7 +13,6 @@ declare const front;
 export class VrMain {
 
   toast: HTMLIonToastElement;
-  fireToggle: any;
   timer: any = null;
   interval: number  = 500;
   initialDelay: number = 7000;
@@ -36,8 +36,7 @@ export class VrMain {
   }
 
   async componentWillLoad() {
-
-    this.seizableItemList = config.seizableItems;
+    this.seizableItemList = cloneDeep(config.seizableItems);
 
     front.on('file server started', fileServerPath => {
       this.fileServerHasStarted = true;
@@ -53,6 +52,7 @@ export class VrMain {
     front.on('reset for new user', debounce(async () => {
       this.activeEnvironment = 0;
       this.userEnvironment = 0;
+      this.seizableItemList = cloneDeep(config.seizableItems);
       const vrScene = this.el.querySelector('vr-scene');
       if (vrScene) vrScene.resetScene();
       await this.presentToast('New user session in progress');
@@ -128,8 +128,10 @@ export class VrMain {
   }
 
   async itemSeized(detail) {
+    const seizableItem = this.seizableItemList.find(item => item.id === detail.seizedItem.id);
+    seizableItem.seized = detail.seizedItem.seized;
     const message = detail.message;
-    console.log(detail.seizedItem);
+    this.seizableItemList = [...this.seizableItemList];
     await this.presentToast(message);
   }
 
@@ -154,7 +156,7 @@ export class VrMain {
   );
 
   mapSeizableItems() {
-    return config.seizableItems.map(item => {
+    return this.seizableItemList.map(item => {
       return <this.SeizableListItem item={item} />;
     });
   }
@@ -203,7 +205,7 @@ export class VrMain {
 
           <nav class="outer-nav right vertical">
             <div>
-            {config.seizableItems.length > 0 ?
+            {this.seizableItemList.length > 0 ?
                 <ion-list>
                   {this.mapSeizableItems()}
                 </ion-list> :
