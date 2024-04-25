@@ -115,6 +115,15 @@ const config =  {
       cameraOverrides: null
     },
     {
+      id: 1,
+      glbID: 'Amazon_Ordering_Device_Holder',
+      name: 'Device Holder',
+      info: 'Amazon Ordering Device Holder',
+      image: 'item1.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
       id: 2,
       glbID: 'Apple_Air_Tag_Box',
       name: 'Air Tracker',
@@ -189,7 +198,7 @@ const config =  {
       seized: false,
       cameraOverrides: null
     },
-    {
+    /*{
       id: 10,
       glbID: 'Burglar_Alarm_A',
       name: 'Burglar Alarms',
@@ -200,7 +209,7 @@ const config =  {
         depth: -0.5,
         up: 0.2
       }
-    },
+    },*/
     {
       id: 11,
       glbID: 'Computer_System',
@@ -650,7 +659,7 @@ const config =  {
     },
     {
       id: 59,
-      glbID: 'USB_Flash_Drive_004',
+      glbID: 'USB_Flash_Drive_002',
       name: 'USB_Stick 2',
       info: 'USB_Stick 2',
       image: 'item58.png',
@@ -659,7 +668,7 @@ const config =  {
     },
     {
       id: 60,
-      glbID: 'USB_Flash_Drive_005',
+      glbID: 'USB_Flash_Drive_003',
       name: 'USB_Stick 3',
       info: 'USB_Stick 3',
       image: 'item58.png',
@@ -668,9 +677,27 @@ const config =  {
     },
     {
       id: 61,
-      glbID: 'USB_Flash_Drive_006',
+      glbID: 'USB_Flash_Drive_004',
       name: 'USB_Stick 4',
       info: 'USB_Stick 4',
+      image: 'item58.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 62,
+      glbID: 'USB_Flash_Drive_005',
+      name: 'USB_Stick 5',
+      info: 'USB_Stick 5',
+      image: 'item58.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 63,
+      glbID: 'USB_Flash_Drive_006',
+      name: 'USB_Stick 6',
+      info: 'USB_Stick 6',
       image: 'item58.png',
       seized: false,
       cameraOverrides: null
