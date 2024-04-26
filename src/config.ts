@@ -386,7 +386,7 @@ const config =  {
     },
     {
       id: 30,
-      glbID: 'Land_Rover_Discovery_Sport',
+      glbID: 'PF_Land_Rover_Discovery_Sport_01a001',
       name: 'Land Rover',
       info: 'Land Rover Discovery Sport',
       image: 'item30.png',
