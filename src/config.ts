@@ -3,20 +3,20 @@ const config =  {
   environments: [
     {
       id: 0,
-      name: 'Outside',
+      name: 'Outside Back',
       cameraPosition: {
-        x: -1.5,
+        x: 7.5,
         y: 1.5,
-        z: -4.3
+        z: 4.7
       },
       cameraRotation: {
-        x: 9,
-        y: 320,
+        x: 6,
+        y: 36,
         z: 0
       },
-      model: 'House.glb',
-      image: 'environment1.jpg',
-      seizableItems: [10,20,30,37,38,52,55]
+      model: '',
+      image: 'environment6.jpg',
+      seizableItems: [48]
     },
     {
       id: 1,
@@ -88,20 +88,20 @@ const config =  {
     },
     {
       id: 5,
-      name: 'Outside Back',
+      name: 'Outside',
       cameraPosition: {
-        x: 7.5,
+        x: -1.5,
         y: 1.5,
-        z: 4.7
+        z: -4.3
       },
       cameraRotation: {
-        x: 6,
-        y: 36,
+        x: 9,
+        y: 320,
         z: 0
       },
-      model: '',
-      image: 'environment6.jpg',
-      seizableItems: [48]
+      model: 'House.glb',
+      image: 'environment1.jpg',
+      seizableItems: [10,20,30,37,38,52,55]
     }
   ],
   seizableItems: [
