@@ -1,33 +1,21 @@
 {
-    "version": "1.0.0",
-    "name": "DMI Tablet",
-    "app-name": "DMI Tablet",
-    "package-name": "dmitabletmanager",
-    "project-type": "webview",
-    "project-name": "DMI Tablet",
-    "screenOrientation": "landscape",
-    "theme": {
-        "fullScreen": false,
-        "colorAccent": "#e3e3e3",
-        "colorPrimary": "#000",
-        "colorPrimaryDark": "#000000"
-    },
-    "icon": "./assets/icon/icon.png",
-    "dist-path": "./dist",
-    "permission": [
-        "android.permission.INTERNET"
+    "name": "EPEViewer",
+    "type": "module",
+    "private": true,
+    "version": "0.1.5",
+    "description": "EPE Viewer",
+    "license": "MIT",
+    "files": [
+        "dist/"
     ],
-    "description": "",
-    "main": "src/main.js",
     "scripts": {
-        "start:node": "node .",
-        "prebuild": "stencil build && copyfiles \"node_modules/**/*\" output && copyfiles package.json output",
-        "build": "cd output && androidjs build && cd ..",
-        "stencil-build": "stencil build",
-        "start": "stencil build --dev --watch --serve"
+        "build": "stencil build && node build-sw.js",
+        "start": "stencil build --dev --watch --serve",
+        "test": "stencil test --spec --e2e",
+        "test.watch": "stencil test --spec --e2e --watch",
+        "generate": "stencil generate"
     },
-    "author": "",
-    "license": "ISC",
+    "author": "Evidential Ltd",
     "dependencies": {
         "@ionic/core": "^6.0.1",
         "@stencil/core": "^2.7.0",
