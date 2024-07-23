@@ -1,0 +1,23 @@
+{
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-dmifrontend-prod-120208-authRole",
+      "UnauthRoleArn": "arn:aws:iam::800636337074:role/amplify-dmifrontend-prod-120208-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::800636337074:role/amplify-dmifrontend-prod-120208-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-dmifrontend-prod-120208-deployment",
+      "UnauthRoleName": "amplify-dmifrontend-prod-120208-unauthRole",
+      "StackName": "amplify-dmifrontend-prod-120208",
+      "StackId": "arn:aws:cloudformation:eu-west-2:800636337074:stack/amplify-dmifrontend-prod-120208/021bd810-48e3-11ef-b0d4-06d2a37ec44d",
+      "AmplifyAppId": "dfd8fg09cwfgk"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "dfd8fg09cwfgk",
+          "type": "cicd"
+        }
+      }
+    }
+  }
+}
