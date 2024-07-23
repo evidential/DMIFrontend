@@ -42,7 +42,7 @@ const VrRoot = class {
       registration.addEventListener('updatefound', async () => {
         const toast = await toastController.create({
           message: "New version available.",
-          buttons: [{ text: `Install new version of EPE Viewer`, role: 'reload' }],
+          buttons: [{ text: `Install new version of DMI Manager App`, role: 'reload' }],
           duration: 0
         });
         await toast.present();
