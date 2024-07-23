@@ -25,7 +25,7 @@ export class VrMain {
   @State() fireSpeed: number = 0;
   @State() fireEnabled: boolean = false;
   @State() fileServerHasStarted: boolean = false;
-  @State() fileServerPath: string = '';
+  @State() fileServerPath: string = config.fileServerPath;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() seizableItemList: any[] = [];

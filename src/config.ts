@@ -1,5 +1,6 @@
 const config =  {
   version: '1.0.0',
+  fileServerPath: 'https://master.dfd8fg09cwfgk.amplifyapp.com/assets/',
   environments: [
     {
       id: 0,
