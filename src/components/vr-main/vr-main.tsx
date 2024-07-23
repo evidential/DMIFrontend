@@ -3,8 +3,7 @@ import {toastController} from "@ionic/core";
 import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
 import { cloneDeep } from 'lodash';
-
-declare const io;
+import { io } from '../../assets/scripts/libraries/socketio-4.7.5.js';
 
 @Component({
   tag: 'vr-main',
@@ -194,7 +193,8 @@ export class VrMain {
               <vr-scene fileServerPath={this.fileServerPath}
                         activeEnvironment={this.activeEnvironment}
                         userEnvironment={this.userEnvironment}
-                        showSplash={this.showSplash}/>
+                        showSplash={this.showSplash}
+                        socket={this.socket}/>
 
             </div>
           </div>

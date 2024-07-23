@@ -1,7 +1,7 @@
 const config =  {
   version: '1.0.0',
   socketServerURL: 'https://socket-server-url',
-  fileServerPath: 'https://master.dfd8fg09cwfgk.amplifyapp.com/assets/',
+  fileServerPath: 'https://master.dfd8fg09cwfgk.amplifyapp.com/assets',
   environments: [
     {
       id: 0,

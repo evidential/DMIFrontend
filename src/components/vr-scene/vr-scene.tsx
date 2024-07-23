@@ -6,7 +6,6 @@ import {config} from "../../config";
 import {debounce, replaceSpacesWithUnderscores} from "../../assets/scripts/utils";
 import { cloneDeep } from 'lodash';
 
-declare const front;
 declare const AFRAME;
 declare const THREE;
 declare const ldBar;
@@ -44,6 +43,7 @@ export class VrScene {
   @Prop() showSplash: boolean = true;
   @Prop() activeEnvironment: number;
   @Prop() userEnvironment: number;
+  @Prop() socket: any;
 
   @Event() itemSeized: EventEmitter;
   @Event() teleportedEnvironment: EventEmitter;
@@ -72,13 +72,13 @@ export class VrScene {
   async componentDidLoad() {
     this.initialiseAFrameComponents();
 
-    front.on('item seized', debounce(itemData => {
+    this.socket.on('item seized', debounce(itemData => {
       setTimeout(() => {
         this.viewItem(itemData.ItemNumber, true);
       }, 100);
     }, 200, true));
 
-    front.on('item unseized', debounce(itemData => {
+    this.socket.on('item unseized', debounce(itemData => {
       setTimeout(() => {
         this.itemUnseized(itemData.ItemNumber);
       }, 100);

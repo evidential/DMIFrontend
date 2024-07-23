@@ -15,6 +15,7 @@ export namespace Components {
         "fileServerPath": string;
         "resetScene": () => Promise<void>;
         "showSplash": boolean;
+        "socket": any;
         "userEnvironment": number;
     }
 }
@@ -58,6 +59,7 @@ declare namespace LocalJSX {
         "onItemSeized"?: (event: VrSceneCustomEvent<any>) => void;
         "onTeleportedEnvironment"?: (event: VrSceneCustomEvent<any>) => void;
         "showSplash"?: boolean;
+        "socket"?: any;
         "userEnvironment"?: number;
     }
     interface IntrinsicElements {
