@@ -4,7 +4,7 @@ import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
 import { cloneDeep } from 'lodash';
 
-declare const front;
+declare const io;
 
 @Component({
   tag: 'vr-main',
@@ -17,6 +17,7 @@ export class VrMain {
   interval: number  = 500;
   initialDelay: number = 7000;
   elapsedTime: number = 0;
+  socket = null;
 
   @Element() el: HTMLElement;
 
@@ -24,7 +25,6 @@ export class VrMain {
   @State() showSplash: boolean = true;
   @State() fireSpeed: number = 0;
   @State() fireEnabled: boolean = false;
-  @State() fileServerHasStarted: boolean = false;
   @State() fileServerPath: string = config.fileServerPath;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
@@ -37,19 +37,23 @@ export class VrMain {
 
   async componentWillLoad() {
     this.seizableItemList = cloneDeep(config.seizableItems);
+    this.setupSocket();
+  }
 
-    front.on('file server started', fileServerPath => {
-      this.fileServerHasStarted = true;
-      this.fileServerPath = fileServerPath;
-    });
+  async componentDidLoad() {
+    this.startSplashTimer();
+  }
 
-    front.on('teleported to area', debounce(async areaData => {
+  setupSocket() {
+    this.socket = io(config.socketServerURL);
+
+    this.socket.on('teleported to area', debounce(async areaData => {
       if (this.activeEnvironment !== areaData.AreaIndex) await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
       this.activeEnvironment = areaData.AreaIndex;
       this.userEnvironment = areaData.AreaIndex;
     }, 500, true));
 
-    front.on('reset for new user', debounce(async () => {
+    this.socket.on('reset for new user', debounce(async () => {
       this.activeEnvironment = 0;
       this.userEnvironment = 0;
       this.seizableItemList = cloneDeep(config.seizableItems);
@@ -57,12 +61,6 @@ export class VrMain {
       if (vrScene) vrScene.resetScene();
       await this.presentToast('New user session in progress');
     }, 500, true));
-
-    front.send('ready');
-  }
-
-  async componentDidLoad() {
-    this.startSplashTimer();
   }
 
   startSplashTimer() {
@@ -190,16 +188,14 @@ export class VrMain {
         <div id="perspective" class="perspective effect-rotateleft">
           <div class="container" onClick={e => this.menuOpen === true && this.toggleMenu(e)}>
             <div id="sceneWrapper" class="wrapper">
-
-              {this.fileServerHasStarted === true &&
-              [<div class="environment-navigation">
+              <div class="environment-navigation">
                 {this.mapEnvironments()}
-              </div>,
+              </div>
               <vr-scene fileServerPath={this.fileServerPath}
                         activeEnvironment={this.activeEnvironment}
                         userEnvironment={this.userEnvironment}
                         showSplash={this.showSplash}/>
-              ]}
+
             </div>
           </div>
 
