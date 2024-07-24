@@ -22,8 +22,6 @@ export class VrMain {
 
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
-  @State() fireSpeed: number = 0;
-  @State() fireEnabled: boolean = false;
   @State() fileServerPath: string = config.fileServerPath;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
@@ -47,7 +45,9 @@ export class VrMain {
     this.socket = io(config.socketServerURL);
 
     this.socket.on('teleported to area', debounce(async areaData => {
-      if (this.activeEnvironment !== areaData.AreaIndex) await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+      if (this.activeEnvironment !== areaData.AreaIndex) {
+        await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+      }
       this.activeEnvironment = areaData.AreaIndex;
       this.userEnvironment = areaData.AreaIndex;
     }, 500, true));
