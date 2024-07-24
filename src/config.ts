@@ -1,6 +1,6 @@
 const config =  {
   version: '1.0.0',
-  socketServerURL: 'http://dmisocketserver-env.eba-smsjewve.eu-west-2.elasticbeanstalk.com:3334/',
+  socketServerURL: 'wss://dmisocketserver-env.eba-smsjewve.eu-west-2.elasticbeanstalk.com:3334',
   fileServerPath: 'https://master.dfd8fg09cwfgk.amplifyapp.com/assets',
   environments: [
     {
