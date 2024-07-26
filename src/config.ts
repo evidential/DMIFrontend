@@ -1,6 +1,6 @@
 const config =  {
   version: '1.0.0',
-  socketServerURL: 'https://evidentialrealityserver.com',
+  socketServerURL: '//evidentialrealityserver.com',
   fileServerPath: 'https://master.dfd8fg09cwfgk.amplifyapp.com/assets',
   environments: [
     {
