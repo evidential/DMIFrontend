@@ -42,7 +42,10 @@ export class VrMain {
   }
 
   setupSocket() {
-    this.socket = io(config.socketServerURL);
+    this.socket = io(config.socketServerURL, {
+      transports: ['websocket', 'polling'],
+      secure: true
+    });
 
     this.socket.on('teleported to area', debounce(async areaData => {
       if (this.activeEnvironment !== areaData.AreaIndex) {
