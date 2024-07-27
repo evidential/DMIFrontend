@@ -22,7 +22,6 @@ export class VrMain {
 
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
-  @State() fileServerPath: string = config.fileServerPath;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() seizableItemList: any[] = [];
@@ -165,27 +164,25 @@ export class VrMain {
       <ion-item class={`seizable-item ${props.item.seized === true && 'seized'}`}
                 lines="full">
         <ion-thumbnail>
-          <img alt={props.item.name} src={`${this.fileServerPath}/images/${props.item.image}`}/>
+          <img alt={props.item.name} src={`./assets/images/${props.item.image}`}/>
         </ion-thumbnail>
         <ion-label>
           <h3>{props.item.name}</h3>
           <p>{props.item.info}</p>
         </ion-label>
         {props.item.seized === true &&
-            <ion-icon color="dark" src={`${this.fileServerPath}/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+            <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
   render() {
     return [
       <div class="main">
-
-        {this.fileServerPath !== '' &&
         <ion-fab slot="fixed" vertical="bottom" horizontal="end">
           <ion-fab-button id="showMenu" onClick={e => this.toggleMenu(e)} color="light">
-            <ion-icon src={this.menuOpen === true ? `${this.fileServerPath}/ionicons/close.svg` : `${this.fileServerPath}/ionicons/briefcase.svg`}></ion-icon>
+            <ion-icon src={this.menuOpen === true ? `./assets/ionicons/close.svg` : `./assets/ionicons/briefcase.svg`}></ion-icon>
           </ion-fab-button>
-        </ion-fab>}
+        </ion-fab>
 
         <div id="perspective" class="perspective effect-rotateleft">
           <div class="container" onClick={e => this.menuOpen === true && this.toggleMenu(e)}>
@@ -193,8 +190,7 @@ export class VrMain {
               <div class="environment-navigation">
                 {this.mapEnvironments()}
               </div>
-              <vr-scene fileServerPath={this.fileServerPath}
-                        activeEnvironment={this.activeEnvironment}
+              <vr-scene activeEnvironment={this.activeEnvironment}
                         userEnvironment={this.userEnvironment}
                         showSplash={this.showSplash}
                         socket={this.socket}/>
