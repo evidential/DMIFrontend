@@ -39,7 +39,6 @@ export class VrScene {
   @State() seizableItemList: any[] = [];
   @State() environmentSeizableItemList: any[] = [];
 
-  @Prop() fileServerPath: string = '';
   @Prop() showSplash: boolean = true;
   @Prop() activeEnvironment: number;
   @Prop() userEnvironment: number;
@@ -171,7 +170,7 @@ export class VrScene {
     const initialisingEl = this.el.querySelector('.initialising-hidden');
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath(`${this.fileServerPath}/scripts/draco/gltf/`);
+    dracoLoader.setDecoderPath(`./assets/scripts/draco/gltf/`);
 
     loader.setDRACOLoader(dracoLoader);
 
@@ -183,7 +182,7 @@ export class VrScene {
         }
 
         loader.load(
-            `${this.fileServerPath}/models/${environment.model}`,
+            `./assets/models/${environment.model}`,
             gltf => {
               gltf.scene.userData = {
                 environmentId: environment.id
@@ -454,13 +453,13 @@ export class VrScene {
   SeizableListItem = (props: { item }) => (
       <ion-item class={`seizable-item ${props.item.seized === true && 'seized'}`} button onClick={() => this.viewItem(props.item.id, false)} lines="full">
         <ion-thumbnail>
-          <img alt={props.item.name} src={`${this.fileServerPath}/images/${props.item.image}`}  />
+          <img alt={props.item.name} src={`./assets/images/${props.item.image}`}  />
         </ion-thumbnail>
         <ion-label>
           <h3>{props.item.name}</h3>
           <p>{props.item.info}</p>
         </ion-label>
-        {props.item.seized === true && <ion-icon color="dark" src={`${this.fileServerPath}/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+        {props.item.seized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
@@ -482,14 +481,14 @@ export class VrScene {
           <div class={`seizable-item-card active-item ${this.activeItemSeized === true && 'seized'}`}>
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-              <img src={`${this.fileServerPath}/images/${config.environments[this.activeEnvironment].image}`}/>
+              <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
               <ion-card-content>
-                <img class="active-item-image" src={`${this.fileServerPath}/images/${this.activeItemImage}`} />
+                <img class="active-item-image" src={`./assets/images/${this.activeItemImage}`} />
                 <h3>{this.activeItemName}</h3>
                 <p>{this.activeItemInfo}</p>
               </ion-card-content>
               <ion-button id="backButton" onClick={() => this.backToScene(true)} expand="full" color="dark">Back
-                <ion-icon src={`${this.fileServerPath}/ionicons/caret-back.svg`} slot="start"/>
+                <ion-icon src={`./assets/ionicons/caret-back.svg`} slot="start"/>
               </ion-button>
             </ion-card>
           </div>
@@ -497,7 +496,7 @@ export class VrScene {
           <div class="seizable-item-card seizable-item-list">
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-              <img src={`${this.fileServerPath}/images/${config.environments[this.activeEnvironment].image}`}/>
+              <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
               <div class="card-content">
                 {this.environmentSeizableItemList.length > 0 ?
                 <ion-list>
@@ -510,8 +509,8 @@ export class VrScene {
 
           <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
             <a-assets>
-              <a-asset-item id="sceneModel" src={`${this.fileServerPath}/models/House.glb`}></a-asset-item>
-              <img id="sky" src={`${this.fileServerPath}/images/skybox-night.png`}/>
+              <a-asset-item id="sceneModel" src={`./assets/models/House.glb`}></a-asset-item>
+              <img id="sky" src={`./assets/images/skybox-night.png`}/>
             </a-assets>
 
             <a-entity light="type: ambient; color: #BBB; intensity: 0.7;"></a-entity>
