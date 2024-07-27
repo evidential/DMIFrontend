@@ -170,7 +170,7 @@ export class VrScene {
     const initialisingEl = this.el.querySelector('.initialising-hidden');
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath(`./assets/scripts/draco/gltf/`);
+    dracoLoader.setDecoderPath(`./assets/scripts/libraries/draco/gltf/`);
 
     loader.setDRACOLoader(dracoLoader);
 
