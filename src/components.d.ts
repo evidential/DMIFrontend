@@ -12,6 +12,7 @@ export namespace Components {
     }
     interface VrScene {
         "activeEnvironment": number;
+        "fileServerPath": string;
         "resetScene": () => Promise<void>;
         "showSplash": boolean;
         "socket": any;
@@ -54,6 +55,7 @@ declare namespace LocalJSX {
     }
     interface VrScene {
         "activeEnvironment"?: number;
+        "fileServerPath"?: string;
         "onItemSeized"?: (event: VrSceneCustomEvent<any>) => void;
         "onTeleportedEnvironment"?: (event: VrSceneCustomEvent<any>) => void;
         "showSplash"?: boolean;
