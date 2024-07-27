@@ -182,7 +182,7 @@ export class VrScene {
         }
 
         loader.load(
-            `./assets/models/${environment.model}`,
+            `${config.s3Bucket}${config.envirinmentModel}`,
             gltf => {
               gltf.scene.userData = {
                 environmentId: environment.id
@@ -509,7 +509,7 @@ export class VrScene {
 
           <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
             <a-assets>
-              <a-asset-item id="sceneModel" src={`./assets/models/House.glb`}></a-asset-item>
+              <a-asset-item id="sceneModel" src={`${config.s3Bucket}${config.envirinmentModel}`}></a-asset-item>
               <img id="sky" src={`./assets/images/skybox-night.png`}/>
             </a-assets>
 
