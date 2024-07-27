@@ -193,7 +193,7 @@ export class VrScene {
               resolve();
             },
             xhr => {
-              this.loadingBars[environment.id].set(Math.ceil(xhr.loaded / xhr.total * 100));
+              this.loadingBars[0].set(Math.ceil(xhr.loaded / xhr.total * 100));
             },
             error => {
               reject(error);
