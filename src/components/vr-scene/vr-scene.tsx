@@ -296,6 +296,7 @@ export class VrScene {
     destination.copy(target.getWorldPosition(new THREE.Vector3()));
     destination.add(direction.normalize().multiplyScalar(depthScalar));
     destination.add(up.multiplyScalar(upScalar));
+    console.log(`${destination.x} ${destination.y} ${destination.z}`);
 
     animationRig.setAttribute('animation__pos', `property: position; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${destination.x} ${destination.y} ${destination.z}`);
   }
@@ -331,7 +332,7 @@ export class VrScene {
     // Apply the adjusted rotation to the initial rotation
     animationCamera.setAttribute('rotation', initialRotation);
     camera.setAttribute('rotation', initialRotation);
-
+console.log(`${targetRotation.x} ${initialRotation.y + deltaY}`);
     // Animate the rotation to the adjusted target rotation
     animationCamera.setAttribute('animation__rot', `property: rotation; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${targetRotation.x} ${initialRotation.y + deltaY} 0`);
   }

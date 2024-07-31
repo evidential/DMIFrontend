@@ -36,7 +36,7 @@ const config =  {
       },
       model: '',
       image: 'environment2.jpg',
-      seizableItems: [0,1,2,3,6,8,11,13,23,22,24,25,26,27,28,31,32,33,34,35,36,43,46,47,49,53,54,56,58,59,60,61,62,63,64,65]
+      seizableItems: [0,1,2,3,6,8,11,13,23,22,24,25,26,27,28,31,32,33,34,35,36,43,46,47,49,53,54,56,58,59,60,61,62,63,64,65,72,73,74]
     },
     {
       id: 2,
@@ -53,7 +53,7 @@ const config =  {
       },
       model: '',
       image: 'environment3.jpg',
-      seizableItems: [4,5,7,9,14,15,16,17,18,19,21,39,40,41,42,45,50,51,57,66]
+      seizableItems: [4,5,7,9,14,15,16,17,18,19,21,39,40,41,42,45,50,51,57,66,69,70,71]
     },
     {
       id: 3,
@@ -104,7 +104,7 @@ const config =  {
       },
       model: 'House.glb',
       image: 'environment1.jpg',
-      seizableItems: [10,20,30,37,38,52,55]
+      seizableItems: [10,20,30,37,38,52,55, 68]
     }
   ],
   seizableItems: [
@@ -521,7 +521,7 @@ const config =  {
     },
     {
       id: 44,
-      glbID: 'SM_Sticky_Note_B',
+      glbID: 'Sticky_Note_B',
       name: 'Post It Note',
       info: 'Post It Note',
       image: 'item44.png',
@@ -551,7 +551,7 @@ const config =  {
     },
     {
       id: 47,
-      glbID: 'Rasberry_Pi_2',
+      glbID: 'Rasberry_Pi_01a_3',
       name: 'Rasberry Pie',
       info: 'Rasberry Pie',
       image: 'item47.png',
@@ -614,7 +614,7 @@ const config =  {
     },
     {
       id: 54,
-      glbID: 'Telsa_Access_Card',
+      glbID: 'Tesla_Access_Card',
       name: 'Tesla Access Card',
       info: 'Tesla Access Card',
       image: 'item54.png',
@@ -707,7 +707,7 @@ const config =  {
     },
     {
       id: 64,
-      glbID: 'Cloud_Storage_Devices',
+      glbID: 'Cloud_Storage_Devices_01a',
       name: 'Cloud Device',
       info: 'WD Personal Cloud Device',
       image: 'item63.png',
@@ -738,6 +738,75 @@ const config =  {
       name: 'Xbox Games Console',
       info: 'Xbox Series S Games Console',
       image: 'item66.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 68,
+      glbID: 'Outdoor_Security_Light',
+      name: 'Outdoor Security Light',
+      info: 'Outdoor Security Light',
+      image: 'item67.png',
+      seized: false,
+      cameraOverrides: {
+        depth: -0.9,
+        up: 0
+      }
+    },
+    {
+      id: 69,
+      glbID: 'Headphones_01a_LOD1',
+      name: 'Headphones',
+      info: 'Music Headphones',
+      image: 'item68.png',
+      seized: false,
+      cameraOverrides: {
+        depth: -0.4,
+        up: 0
+      }
+    },
+    {
+      id: 70,
+      glbID: 'Fingbox_01a',
+      name: 'Fingbox',
+      info: 'Fingbox Network Device',
+      image: 'item69.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 71,
+      glbID: 'Fingbox_Network_Box_01a',
+      name: 'Fingbox Box',
+      info: 'Fingbox Packaging Box',
+      image: 'item70.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 72,
+      glbID: 'Rasberry_Pi_2',
+      name: 'Rasberry Pi With Screen',
+      info: 'Rasberry Pi With Screen',
+      image: 'item71.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 73,
+      glbID: 'Plug_A',
+      name: 'USB C Plug',
+      info: 'USB C Plug',
+      image: 'item72.png',
+      seized: false,
+      cameraOverrides: null
+    },
+    {
+      id: 74,
+      glbID: '__20_Note',
+      name: '£20 note',
+      info: 'Twenty pound note',
+      image: 'item73.png',
       seized: false,
       cameraOverrides: null
     }
