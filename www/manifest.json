@@ -3,6 +3,7 @@
   "short_name": "dmitabletvr",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "landscape",
   "icons": [{
     "src": "assets/icon/icon192.png",
     "sizes": "192x192",
