@@ -20,11 +20,18 @@ export class VrMain {
 
   @Element() el: HTMLElement;
 
+  @State() reviewEnabled: boolean = false;
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() seizableItemList: any[] = [];
+  @State() environmentLoaded: boolean = false;
+
+  @Listen('environmentLoaded')
+  async environmentLoadedHandler() {
+    this.environmentLoaded = true;
+  }
 
   @Listen('itemSeized')
   async markerAddedHandler(event) {
@@ -139,6 +146,16 @@ export class VrMain {
     await this.presentToast(`User moved to ${config.environments[this.activeEnvironment].name}`);
   }
 
+  async toggleReview() {
+    this.reviewEnabled = !this.reviewEnabled;
+
+    if (this.reviewEnabled === true) {
+      console.log('Review enabled');
+    } else {
+      console.log('Review disabled');
+    }
+  }
+
   mapEnvironments() {
     return config.environments.map(environment => {
       let activeEnvironment = '';
@@ -178,7 +195,8 @@ export class VrMain {
   render() {
     return [
       <div class="main">
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end"
+                 hidden={!this.reviewEnabled}>
           <ion-fab-button id="showMenu" onClick={e => this.toggleMenu(e)} color="light">
             <ion-icon src={this.menuOpen === true ? `./assets/ionicons/close.svg` : `./assets/ionicons/briefcase.svg`}></ion-icon>
           </ion-fab-button>
@@ -187,12 +205,14 @@ export class VrMain {
         <div id="perspective" class="perspective effect-rotateleft">
           <div class="container" onClick={e => this.menuOpen === true && this.toggleMenu(e)}>
             <div id="sceneWrapper" class="wrapper">
-              <div class="environment-navigation">
+              <div class="environment-navigation"
+                   hidden={!this.reviewEnabled}>
                 {this.mapEnvironments()}
               </div>
               <vr-scene activeEnvironment={this.activeEnvironment}
                         userEnvironment={this.userEnvironment}
                         showSplash={this.showSplash}
+                        reviewEnabled={this.reviewEnabled}
                         socket={this.socket}/>
 
             </div>
@@ -207,6 +227,17 @@ export class VrMain {
                 <div class="no-items">No seizable items for {config.environments[this.activeEnvironment].name}</div>}
             </div>
           </nav>
+
+          <ion-button class={`review-toggle-button ${this.reviewEnabled === true ? 'review-toggle-button--enabled' : 'review-toggle-button--disabled'}`}
+                      onClick={() => this.toggleReview()}
+                      color={this.reviewEnabled === true ? 'primary' : 'light'}
+                      hidden={!this.environmentLoaded}>
+            {this.reviewEnabled === true ? 'Disable' : 'Enable'} Review Mode
+            <ion-icon name={this.reviewEnabled === true ? 'stats-chart' : 'stats-chart-outline'}
+                      slot="end"
+                      aria-hidden="true" />
+          </ion-button>
+
         </div>
 
         <div class={`splash ${this.showSplash === true ? 'splash--show' : ''}`}>

@@ -43,7 +43,9 @@ export class VrScene {
   @Prop() activeEnvironment: number;
   @Prop() userEnvironment: number;
   @Prop() socket: any;
+  @Prop() reviewEnabled: boolean;
 
+  @Event() environmentLoaded: EventEmitter;
   @Event() itemSeized: EventEmitter;
   @Event() teleportedEnvironment: EventEmitter;
 
@@ -208,6 +210,7 @@ export class VrScene {
           setTimeout(() => {
             environmentLoadingEl.classList.add('environment-loading--loaded');
             aFrameSceneEl.classList.remove('aframe-scene--loading');
+            this.environmentLoaded.emit();
           }, 2000);
         })
         .catch(error => {
