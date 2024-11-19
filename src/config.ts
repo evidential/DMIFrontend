@@ -1,5 +1,5 @@
 const config =  {
-  version: '1.1.1',
+  version: '1.1.2',
   socketServerURL: '//evidentialrealityserver.com',
   s3Bucket: 'https://dmi-frontend.s3.eu-west-2.amazonaws.com/',
   envirinmentModel: 'House.glb',
