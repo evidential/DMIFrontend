@@ -1,5 +1,5 @@
 const config =  {
-  version: '1.1.2',
+  version: '1.2.0',
   socketServerURL: '//evidentialrealityserver.com',
   s3Bucket: 'https://dmi-frontend.s3.eu-west-2.amazonaws.com/',
   envirinmentModel: 'House.glb',
@@ -104,7 +104,7 @@ const config =  {
       },
       model: 'House.glb',
       image: 'environment1.jpg',
-      interactableItems: [20,30,37,38,52,55, 68]
+      interactableItems: [20,30,37,38,52,55,68]
     }
   ],
   interactableItems: [

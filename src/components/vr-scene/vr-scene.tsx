@@ -38,6 +38,8 @@ export class VrScene {
   @State() cameraRotation: string = '';
   @State() interactableItemList: any[] = [];
   @State() environmentInteractableItemList: any[] = [];
+  @State() filteredItemList: any[] = [];
+  @State() segmentSelectedName: string = 'interactive';
 
   @Prop() showSplash: boolean = true;
   @Prop() activeEnvironment: number;
@@ -77,6 +79,7 @@ export class VrScene {
 
   async componentDidLoad() {
     this.initialiseAFrameComponents();
+    this.changeItemList(this.segmentSelectedName);
 
     this.socket.on('item updated', debounce(itemData => {
       setTimeout(() => {
@@ -115,6 +118,7 @@ export class VrScene {
   updateEnvironmentItems(environmentIndex: number) {
     const interactableItemsIds = config.environments.find(environment => environment.id === environmentIndex).interactableItems;
     this.environmentInteractableItemList = this.interactableItemList.filter(item => interactableItemsIds.includes(item.ItemNumber));
+    this.changeItemList('interactive');
   }
 
   setCamera(environmentIndex: number) {
@@ -368,6 +372,8 @@ export class VrScene {
       interactableItem.IsTriaged = interactiveItem.IsTriaged;
       this.activeItemState = this.getitemState(interactableItem);
 
+      this.changeItemList('interactive');
+
       this.highlightInteractedItem(itemMesh, true);
 
       this.itemInteractedWith.emit({
@@ -441,8 +447,35 @@ export class VrScene {
     interactableItemList.classList.toggle('flipped');
   }
 
-  mapInteractableItems() {
-    return this.environmentInteractableItemList.map(item => {
+  changeItemList(value) {
+    let itemList;
+
+    switch(value) {
+      case 'all':
+        this.segmentSelectedName = 'interactive';
+        itemList = [...this.environmentInteractableItemList];
+        break;
+      case 'seized':
+        this.segmentSelectedName = 'seized';
+        itemList = this.environmentInteractableItemList.filter(item => {
+          return item.IsSeized === true;
+        });
+        break;
+      case 'triaged':
+        this.segmentSelectedName = 'triaged';
+        itemList = this.environmentInteractableItemList.filter(item => {
+          return item.IsTriaged === true;
+        });
+        break;
+      default:
+        itemList = [...this.environmentInteractableItemList];
+    }
+
+    this.filteredItemList = this.mapInteractableItems(itemList);
+  }
+
+  mapInteractableItems(itemList) {
+    return itemList.map(item => {
       return <this.InteractableListItem item={item} />;
     });
   }
@@ -496,12 +529,25 @@ export class VrScene {
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
+              <ion-segment class="list-segment" value="all"
+                           onIonChange={e => this.changeItemList(e.detail.value)}
+                           hidden={!this.reviewEnabled}>
+                <ion-segment-button value="all">
+                  <ion-label>All</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="triaged">
+                  <ion-label>Triaged</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="seized">
+                  <ion-label>Seized</ion-label>
+                </ion-segment-button>
+              </ion-segment>
               <div class="card-content">
-                {this.environmentInteractableItemList.length > 0 ?
+                {this.filteredItemList.length > 0 ?
                 <ion-list>
-                  {this.mapInteractableItems()}
+                  {this.filteredItemList}
                 </ion-list> :
-                <div class="no-items">No interacted items for {config.environments[this.activeEnvironment].name}</div>}
+                <div class="no-items">No {this.segmentSelectedName} items for {config.environments[this.activeEnvironment].name}</div>}
               </div>
             </ion-card>
           </div>

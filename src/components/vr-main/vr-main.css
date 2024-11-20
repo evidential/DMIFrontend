@@ -193,6 +193,10 @@ model-viewer {
     font-weight: 500;
 }
 
+.outer-nav ion-list {
+    min-height: 25vh;
+}
+
 .list-segment {
     position: sticky;
     top: 0;

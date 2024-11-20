@@ -72,6 +72,7 @@ export class VrMain {
       this.userEnvironment = 0;
       this.interactableItemList = cloneDeep(config.interactableItems);
       this.reviewEnabled = true;
+      this.resetSegment();
       this.changeItemList('interactive');
       await this.toggleReview();
       const vrScene = this.el.querySelector('vr-scene');
@@ -100,6 +101,13 @@ export class VrMain {
     if (this.elapsedTime >= this.initialDelay && VRSceneEl !== null) {
       this.showSplash = false;
       this.stopSplashTimer();
+    }
+  }
+
+  resetSegment() {
+    const segment = this.el.querySelector('ion-segment');
+    if (segment) {
+      segment.value = 'all';
     }
   }
 
