@@ -56,7 +56,7 @@ declare namespace LocalJSX {
     interface VrScene {
         "activeEnvironment"?: number;
         "onEnvironmentLoaded"?: (event: VrSceneCustomEvent<any>) => void;
-        "onItemSeized"?: (event: VrSceneCustomEvent<any>) => void;
+        "onItemInteractedWith"?: (event: VrSceneCustomEvent<any>) => void;
         "onTeleportedEnvironment"?: (event: VrSceneCustomEvent<any>) => void;
         "reviewEnabled"?: boolean;
         "showSplash"?: boolean;

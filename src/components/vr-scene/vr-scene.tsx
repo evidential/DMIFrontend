@@ -30,14 +30,14 @@ export class VrScene {
   @Element() el: HTMLElement;
 
   @State() sceneReady: boolean = false;
-  @State() activeItemSeized: boolean = false;
+  @State() activeItemState: string = '';
   @State() activeItemName: string = '';
   @State() activeItemInfo: string = '';
   @State() activeItemImage: string = '';
   @State() cameraPosition: string = '';
   @State() cameraRotation: string = '';
-  @State() seizableItemList: any[] = [];
-  @State() environmentSeizableItemList: any[] = [];
+  @State() interactableItemList: any[] = [];
+  @State() environmentInteractableItemList: any[] = [];
 
   @Prop() showSplash: boolean = true;
   @Prop() activeEnvironment: number;
@@ -46,7 +46,7 @@ export class VrScene {
   @Prop() reviewEnabled: boolean;
 
   @Event() environmentLoaded: EventEmitter;
-  @Event() itemSeized: EventEmitter;
+  @Event() itemInteractedWith: EventEmitter;
   @Event() teleportedEnvironment: EventEmitter;
 
   @Watch('showSplash')
@@ -65,23 +65,24 @@ export class VrScene {
     this.changeEnvironment(this.activeEnvironment);
   }
 
+  @Watch('reviewEnabled')
+  async reviewEnabledHandler() {
+    this.backToScene(true);
+  }
+
   async componentWillLoad() {
-    this.seizableItemList = cloneDeep(config.seizableItems);
+    this.interactableItemList = cloneDeep(config.interactableItems);
     this.updateEnvironmentItems(0);
   }
 
   async componentDidLoad() {
     this.initialiseAFrameComponents();
 
-    this.socket.on('item seized', debounce(itemData => {
+    this.socket.on('item updated', debounce(itemData => {
       setTimeout(() => {
-        this.viewItem(itemData.ItemNumber, true);
-      }, 100);
-    }, 200, true));
-
-    this.socket.on('item unseized', debounce(itemData => {
-      setTimeout(() => {
-        this.itemUnseized(itemData.ItemNumber);
+        if (itemData.IsSeized || itemData.IsTriaged || itemData.IsIgnored) {
+          this.viewItem(itemData, true);
+        }
       }, 100);
     }, 200, true));
   }
@@ -89,14 +90,14 @@ export class VrScene {
   @Method()
   async resetScene() {
     const activeItem = this.el.querySelector('.active-item');
-    const seizableItemList = this.el.querySelector('.seizable-item-list');
-    this.seizableItemList = cloneDeep(config.seizableItems);
+    const interactableItemList = this.el.querySelector('.interactable-item-list');
+    this.interactableItemList = cloneDeep(config.interactableItems);
     this.updateEnvironmentItems(0);
 
     if (this.viewingItem === true) {
       this.viewingItem = false;
       activeItem.classList.toggle('flipped');
-      seizableItemList.classList.toggle('flipped');
+      interactableItemList.classList.toggle('flipped');
       this.toggleItemOverlay();
     }
 
@@ -112,8 +113,8 @@ export class VrScene {
   }
 
   updateEnvironmentItems(environmentIndex: number) {
-    const seizableItemsIds = config.environments.find(environment => environment.id === environmentIndex).seizableItems;
-    this.environmentSeizableItemList = this.seizableItemList.filter(item => seizableItemsIds.includes(item.id));
+    const interactableItemsIds = config.environments.find(environment => environment.id === environmentIndex).interactableItems;
+    this.environmentInteractableItemList = this.interactableItemList.filter(item => interactableItemsIds.includes(item.ItemNumber));
   }
 
   setCamera(environmentIndex: number) {
@@ -338,80 +339,74 @@ export class VrScene {
     animationCamera.setAttribute('animation__rot', `property: rotation; easing: easeInOutQuad; dur: ${this.itemAnimationDuration}; to: ${targetRotation.x} ${initialRotation.y + deltaY} 0`);
   }
 
-  viewItem(itemId, itemSeized) {
-    const seizableItem = this.seizableItemList.find(item => item.id === itemId);
-    const glbMeshID = seizableItem.glbID;
-    const itemName = seizableItem.name;
-    const itemInfo = seizableItem.info;
-    const cameraOverrides = seizableItem.cameraOverrides;
+  viewItem(interactiveItem, itemInteractedWith) {
+    const interactableItem = this.interactableItemList.find(item => item.ItemNumber === interactiveItem.ItemNumber);
+    const glbMeshID = interactableItem.glbID;
+    const itemName =interactableItem.name;
+    const itemInfo = interactableItem.info;
+    const cameraOverrides = interactableItem.cameraOverrides;
     const activeItem = this.el.querySelector('.active-item');
-    const seizableItemList = this.el.querySelector('.seizable-item-list');
+    const interactableItemList = this.el.querySelector('.interactable-item-list');
     const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
 
-    this.activeItemSeized = seizableItem.seized;
+    this.activeItemState = this.getitemState(interactableItem);
+
     this.activeItemName = itemName;
     this.activeItemInfo = itemInfo;
-    this.activeItemImage = seizableItem.image;
+    this.activeItemImage =interactableItem.image;
 
-    if (this.userEnvironment !== this.activeEnvironment) {
-      this.activeEnvironment = this.userEnvironment;
-      this.changeEnvironment(this.activeEnvironment);
+    if (this.reviewEnabled === false) {
+      if (this.userEnvironment !== this.activeEnvironment) {
+        this.activeEnvironment = this.userEnvironment;
+        this.changeEnvironment(this.activeEnvironment);
+      }
     }
 
-    if (itemSeized === true) {
-      seizableItem.seized = true;
-      this.activeItemSeized = true;
+    if (itemInteractedWith === true) {
+      interactableItem.IsIgnored = interactiveItem.IsIgnored;
+      interactableItem.IsSeized = interactiveItem.IsSeized;
+      interactableItem.IsTriaged = interactiveItem.IsTriaged;
+      this.activeItemState = this.getitemState(interactableItem);
 
-      this.highlightSeizedItem(itemMesh, true);
+      this.highlightInteractedItem(itemMesh, true);
 
-      this.itemSeized.emit({
-        seizedItem: seizableItem,
-        message: `${itemName} seized from ${config.environments[this.userEnvironment].name}`
+      this.itemInteractedWith.emit({
+        interactedWithItem: interactableItem,
+        message: `${itemName} ${ this.getitemState(interactableItem)} from ${config.environments[this.userEnvironment].name}`
       });
     }
 
-    setTimeout(() => {
-      this.moveCameraToItem(itemMesh, cameraOverrides);
+    if (this.reviewEnabled === false) {
+      setTimeout(() => {
+        this.moveCameraToItem(itemMesh, cameraOverrides);
 
-      if (this.viewingItem === false) {
-        this.viewingItem = !this.viewingItem;
+        if (this.viewingItem === false) {
+          this.viewingItem = !this.viewingItem;
 
-        activeItem.classList.toggle('flipped');
-        seizableItemList.classList.toggle('flipped');
+          activeItem.classList.toggle('flipped');
+          interactableItemList.classList.toggle('flipped');
 
-        this.toggleItemOverlay();
-      }
-    }, 100);
+          this.toggleItemOverlay();
+        }
+      }, 100);
+    }
   }
 
-  itemUnseized(itemId) {
-    const seizedItem = this.seizableItemList.find(item => item.id === itemId);
-    const glbMeshID = seizedItem.glbID;
-    const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
-    const itemName = seizedItem.name;
-
-    seizedItem.seized = false;
-
-    this.highlightSeizedItem(itemMesh, false);
-
-    this.activeItemSeized = false;
-    this.environmentSeizableItemList = [...this.environmentSeizableItemList];
-
-    this.itemSeized.emit({
-      seizedItem,
-      message: `${itemName} unseized from ${config.environments[this.userEnvironment].name}`
-    });
+  getitemState(item) {
+    return ['IsSeized', 'IsTriaged', 'IsIgnored'].find(key => {
+      return item[key];
+    })?.replace('Is', '').toLowerCase() || '';
   }
 
-  highlightSeizedItem(itemEntity, seized) {
-    console.log(itemEntity, seized);
+  highlightInteractedItem(itemEntity, interacted) {
+    console.log(itemEntity, interacted);
   }
 
   backToScene(animate: boolean) {
     if (this.viewingItem === false) return;
 
     const activeItem = this.el.querySelector('.active-item');
-    const seizableItemList = this.el.querySelector('.seizable-item-list');
+    const interactableItemList = this.el.querySelector('.interactable-item-list');
     const animationRig: any = this.el.querySelector('#animationRig');
     const rig: any = this.el.querySelector('#rig');
     const camera: any = this.el.querySelector('#camera');
@@ -443,17 +438,17 @@ export class VrScene {
     this.toggleItemOverlay();
 
     activeItem.classList.toggle('flipped');
-    seizableItemList.classList.toggle('flipped');
+    interactableItemList.classList.toggle('flipped');
   }
 
-  mapSeizableItems() {
-    return this.environmentSeizableItemList.map(item => {
-      return <this.SeizableListItem item={item} />;
+  mapInteractableItems() {
+    return this.environmentInteractableItemList.map(item => {
+      return <this.InteractableListItem item={item} />;
     });
   }
 
-  SeizableListItem = (props: { item }) => (
-      <ion-item class={`seizable-item ${props.item.seized === true && 'seized'}`} button onClick={() => this.viewItem(props.item.id, false)} lines="full">
+  InteractableListItem = (props: { item }) => (
+      <ion-item class={`interactable-item ${props.item.IsIgnored === true && 'ignored'} ${props.item.IsSeized === true && 'seized'} ${props.item.IsTriaged === true && 'triaged'}`} button onClick={() => this.viewItem(props.item, false)} lines="full">
         <ion-thumbnail>
           <img alt={props.item.name} src={`./assets/images/${props.item.image}`}  />
         </ion-thumbnail>
@@ -461,7 +456,8 @@ export class VrScene {
           <h3>{props.item.name}</h3>
           <p>{props.item.info}</p>
         </ion-label>
-        {props.item.seized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+        {props.item.IsTriaged === true && <ion-icon color="dark" src={`./assets/ionicons/eye.svg`} slot="end"></ion-icon>}
+        {props.item.IsSeized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
@@ -478,9 +474,10 @@ export class VrScene {
             </div>
           </div>
 
-          <div id="itemOverlay" class="item-overlay item-overlay--hidden"></div>
+          <div id="itemOverlay" class="item-overlay item-overlay--hidden"
+               hidden={this.reviewEnabled}></div>
 
-          <div class={`seizable-item-card active-item ${this.activeItemSeized === true && 'seized'}`}>
+          <div class={`interactable-item-card active-item ${this.activeItemState}`}>
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
@@ -495,16 +492,16 @@ export class VrScene {
             </ion-card>
           </div>
 
-          <div class="seizable-item-card seizable-item-list">
+          <div class="interactable-item-card interactable-item-list">
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
               <div class="card-content">
-                {this.environmentSeizableItemList.length > 0 ?
+                {this.environmentInteractableItemList.length > 0 ?
                 <ion-list>
-                  {this.mapSeizableItems()}
+                  {this.mapInteractableItems()}
                 </ion-list> :
-                <div class="no-items">No seizable items for {config.environments[this.activeEnvironment].name}</div>}
+                <div class="no-items">No interacted items for {config.environments[this.activeEnvironment].name}</div>}
               </div>
             </ion-card>
           </div>

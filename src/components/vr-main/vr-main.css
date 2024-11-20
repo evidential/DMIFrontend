@@ -78,6 +78,7 @@ model-viewer {
     border: 3px solid #000;
     border-radius: 5px;
     opacity: 0.5;
+    cursor: pointer;
 }
 
 .environment-container img.environment-active {
@@ -96,8 +97,8 @@ model-viewer {
 /* Modal view */
 .perspective.modalview {
     position: fixed;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
+    -webkit-perspective: 600px;
+    perspective: 600px;
 }
 
 .modalview .container {
@@ -120,12 +121,13 @@ model-viewer {
 }
 
 /* Outer Nav */
+
 .outer-nav {
     position: absolute;
     height: auto;
     font-size: 2em;
     pointer-events: none;
-    width: 20vw;
+    width: 25vw;
 }
 
 .outer-nav.vertical {
@@ -178,6 +180,31 @@ model-viewer {
     backface-visibility: hidden;
 }
 
+.outer-nav .no-items {
+    font-size: 3vh;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    height: 25vh;
+    padding: 20px;
+    background-color: #fff;
+    color: #000;
+    font-weight: 500;
+}
+
+.list-segment {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    --background: #fff;
+}
+
+.list-segment ion-segment-button {
+    --color: var(--ion-color-dark);
+    --color-checked: #4a638e;
+}
+
 /* Effect Rotate Left */
 .effect-rotateleft {
     background-image: radial-gradient(#4f85e9, var(--ion-color-dark));
@@ -206,7 +233,8 @@ model-viewer {
 }
 
 .effect-rotateleft .outer-nav label,
-.effect-rotateleft .outer-nav div {
+.effect-rotateleft .outer-nav div,
+.effect-rotateleft .outer-nav .list-segment {
     opacity: 0;
     -webkit-transform: translateX(350px) translateZ(-1000px);
     transform: translateX(350px) translateZ(-1000px);
@@ -215,7 +243,8 @@ model-viewer {
 }
 
 .effect-rotateleft.animate .outer-nav div,
-.effect-rotateleft.animate .outer-nav label {
+.effect-rotateleft.animate .outer-nav label,
+.effect-rotateleft.animate .outer-nav .list-segment {
     opacity: 1;
     -webkit-transform: translateX(0) translateZ(0);
     transform: translateX(0) translateZ(0);
@@ -227,7 +256,7 @@ ion-toast {
     text-align: center;
 }
 
-.seizable-item-card {
+.interactable-item-card {
     position: absolute;
     right: 20px;
     top: 0;
@@ -237,30 +266,30 @@ ion-toast {
     backface-visibility: hidden;
 }
 
-.seizable-item-card.active-item {
+.interactable-item-card.active-item {
     transform: perspective(1000px) rotateY(180deg);
 }
 
-.seizable-item-card.active-item.flipped {
+.interactable-item-card.active-item.flipped {
     transform: perspective(1000px) rotateY(0deg);
 }
 
-.seizable-item-card.seizable-item-list {
+.interactable-item-card.interactable-item-list {
     transform: perspective(1000px) rotateY(0deg);
 }
 
-.seizable-item-card.seizable-item-list.flipped {
+.interactable-item-card.interactable-item-list.flipped {
     transform: perspective(1000px) rotateY(-180deg);
 }
 
-.seizable-item-card.active-item ion-card-content {
+.interactable-item-card.active-item ion-card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.seizable-item-card.active-item.seized ion-card-content:after {
-    background-image: url('../assets/images/seized.png');
+.interactable-item-card.active-item.seized ion-card-content:after,
+.interactable-item-card.active-item.triaged ion-card-content:after {
     background-size: 85%;
     background-repeat: no-repeat;
     background-position: 50% 0;
@@ -273,30 +302,38 @@ ion-toast {
     bottom: 0;
 }
 
-.seizable-item-card ion-card > img {
+.interactable-item-card.active-item.seized ion-card-content:after {
+    background-image: url('../assets/images/seized.png');
+}
+
+.interactable-item-card.active-item.triaged ion-card-content:after {
+    background-image: url('../assets/images/triaged.png');
+}
+
+.interactable-item-card ion-card > img {
     height: 100px;
     width: 100%;
 }
 
-.seizable-item-card.active-item img.active-item-image {
+.interactable-item-card.active-item img.active-item-image {
     filter: drop-shadow(1px 3px 4px black);
     height: 10vh;
     margin: 5px 0 0;
 }
 
-.seizable-item-card.active-item h3 {
+.interactable-item-card.active-item h3 {
     text-align: center;
     font-size: 16px;
     font-weight: 600;
 }
 
-.seizable-item-card .card-content {
+.interactable-item-card .card-content {
     background-color: #fff;
     height: calc(45vh - 130px);
     min-height: 180px;
 }
 
-.seizable-item-card .no-items {
+.interactable-item-card .no-items {
     font-size: 3vh;
     text-align: center;
     display: flex;
@@ -305,7 +342,7 @@ ion-toast {
     padding: 20px;
 }
 
-.seizable-item-card ion-card {
+.interactable-item-card ion-card {
     border: 3px solid black;
     height: 45vh;
     min-height: 280px;
@@ -313,16 +350,16 @@ ion-toast {
     background-color: #fff;
 }
 
-.seizable-item-card ion-list {
+.interactable-item-card ion-list {
     height: 100%;
     overflow: scroll;
 }
 
-.seizable-item-card ion-list ion-label h3 {
+.interactable-item-card ion-list ion-label h3 {
     font-weight: 500;
 }
 
-.seizable-item-card .environment-name {
+.interactable-item-card .environment-name {
     position: absolute;
     top: 5vh;
     left: 20px;
@@ -334,7 +371,7 @@ ion-toast {
     z-index: 1;
 }
 
-.seizable-item-card ion-button {
+.interactable-item-card ion-button {
     position: absolute;
     right: 0;
     left: 0;
@@ -343,20 +380,28 @@ ion-toast {
     font-size: 2.5vh;
 }
 
-.seizable-item {
+.interactable-item {
     --padding-start: 10px;
 }
 
-.seizable-item ion-thumbnail {
+.interactable-item ion-thumbnail {
     filter: drop-shadow(1px 3px 4px black);
     height: 44px;
     width: 44px;
     margin: 0 15px 0 0;
 }
 
-.seizable-item.seized ion-label {
+.interactable-item.seized ion-label,
+.interactable-item.triaged ion-label {
     background-size: 85%;
-    background-image: url(../assets/images/seized.png);
     background-position: 50%;
     background-repeat: no-repeat;
+}
+
+.interactable-item.seized ion-label {
+    background-image: url(../assets/images/seized.png);
+}
+
+.interactable-item.triaged ion-label {
+    background-image: url(../assets/images/triaged.png);
 }

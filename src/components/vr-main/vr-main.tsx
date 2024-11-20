@@ -25,25 +25,29 @@ export class VrMain {
   @State() showSplash: boolean = true;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
-  @State() seizableItemList: any[] = [];
+  @State() interactableItemList: any[] = [];
+  @State() filteredItemList: any[] = [];
+  @State() triagedItemList: any[] = [];
   @State() environmentLoaded: boolean = false;
+  @State() segmentSelectedName: string = 'interactive';
 
   @Listen('environmentLoaded')
   async environmentLoadedHandler() {
     this.environmentLoaded = true;
   }
 
-  @Listen('itemSeized')
-  async markerAddedHandler(event) {
-    await this.itemSeized(event.detail);
+  @Listen('itemInteractedWith')
+  async itemInteractedWithHandler(event) {
+    await this.itemInteractedWith(event.detail);
   }
 
   async componentWillLoad() {
-    this.seizableItemList = cloneDeep(config.seizableItems);
+    this.interactableItemList = cloneDeep(config.interactableItems);
     this.setupSocket();
   }
 
   async componentDidLoad() {
+    this.changeItemList(this.segmentSelectedName);
     this.startSplashTimer();
   }
 
@@ -54,17 +58,22 @@ export class VrMain {
     });
 
     this.socket.on('teleported to area', debounce(async areaData => {
-      if (this.activeEnvironment !== areaData.AreaIndex) {
-        await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+      if (this.reviewEnabled === false) {
+        if (this.activeEnvironment !== areaData.AreaIndex) {
+          await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+        }
+        this.activeEnvironment = areaData.AreaIndex;
       }
-      this.activeEnvironment = areaData.AreaIndex;
       this.userEnvironment = areaData.AreaIndex;
     }, 500, true));
 
     this.socket.on('reset for new user', debounce(async () => {
       this.activeEnvironment = 0;
       this.userEnvironment = 0;
-      this.seizableItemList = cloneDeep(config.seizableItems);
+      this.interactableItemList = cloneDeep(config.interactableItems);
+      this.reviewEnabled = true;
+      this.changeItemList('interactive');
+      await this.toggleReview();
       const vrScene = this.el.querySelector('vr-scene');
       if (vrScene) vrScene.resetScene();
       await this.presentToast('New user session in progress');
@@ -94,13 +103,14 @@ export class VrMain {
     }
   }
 
-  toggleMenu(e) {
+  toggleMenu(e = null) {
     const perspectiveWrapper: HTMLElement = document.getElementById('perspective');
 
     if (this.menuOpen === false) {
+      if (e === null) return;
       this.menuOpen = true;
-      e.stopPropagation();
-      if (e.cancelable) e.preventDefault();
+      e?.stopPropagation();
+      if (e?.cancelable) e?.preventDefault();
       perspectiveWrapper.classList.add('modalview');
       setTimeout( function() {
         perspectiveWrapper.classList.add('animate');
@@ -127,33 +137,64 @@ export class VrMain {
     this.toast = await toastController.create({
       message,
       duration: 2000,
-      position: 'bottom'
+      position: 'top'
     });
 
     await this.toast.present();
   }
 
-  async itemSeized(detail) {
-    const seizableItem = this.seizableItemList.find(item => item.id === detail.seizedItem.id);
-    seizableItem.seized = detail.seizedItem.seized;
+  async itemInteractedWith(detail) {
+    const interactedWithItem = this.interactableItemList.find(item => item.ItemNumber === detail.interactedWithItem.ItemNumber);
+    interactedWithItem.IsIgnored = detail.interactedWithItem.IsIgnored;
+    interactedWithItem.IsSeized = detail.interactedWithItem.IsSeized;
+    interactedWithItem.IsTriaged = detail.interactedWithItem.IsTriaged;
     const message = detail.message;
-    this.seizableItemList = [...this.seizableItemList];
-    await this.presentToast(message);
+
+    this.interactableItemList = [...this.interactableItemList];
+    this.changeItemList(this.segmentSelectedName);
+
+    if (this.reviewEnabled === false) await this.presentToast(message);
   }
 
-  async setActiveEnvironment(id) {
+  async setActiveEnvironment(id, showToast = true) {
     this.activeEnvironment = id;
-    await this.presentToast(`User moved to ${config.environments[this.activeEnvironment].name}`);
+    if (showToast) await this.presentToast(`User moved to ${config.environments[this.activeEnvironment].name}`);
   }
 
   async toggleReview() {
     this.reviewEnabled = !this.reviewEnabled;
 
-    if (this.reviewEnabled === true) {
-      console.log('Review enabled');
-    } else {
-      console.log('Review disabled');
+    if (this.reviewEnabled === false) {
+      this.toggleMenu();
+      this.activeEnvironment = this.userEnvironment;
     }
+  }
+
+  changeItemList(value) {
+    let itemList;
+
+    switch(value) {
+      case 'all':
+        this.segmentSelectedName = 'interactive';
+        itemList = [...this.interactableItemList];
+        break;
+      case 'seized':
+        this.segmentSelectedName = 'seized';
+        itemList = this.interactableItemList.filter(item => {
+          return item.IsSeized === true;
+        });
+        break;
+      case 'triaged':
+        this.segmentSelectedName = 'triaged';
+        itemList = this.interactableItemList.filter(item => {
+          return item.IsTriaged === true;
+        });
+        break;
+      default:
+        itemList = [...this.interactableItemList];
+    }
+
+    this.filteredItemList = this.mapInteractableItems(itemList);
   }
 
   mapEnvironments() {
@@ -165,20 +206,20 @@ export class VrMain {
   }
 
   EnvironmentLink = (props: { environment, activeEnvironment}) => (
-      <div class="environment-container" onClick={() => this.setActiveEnvironment(props.environment.id)}>
+      <div class="environment-container" onClick={() => this.setActiveEnvironment(props.environment.id, false)}>
         <div class="environment-link-name">{`${config.environments[props.environment.id].name}`}</div>
         <img class={props.activeEnvironment} src={`../assets/images/${config.environments[props.environment.id].image}`} />
       </div>
   );
 
-  mapSeizableItems() {
-    return this.seizableItemList.map(item => {
-      return <this.SeizableListItem item={item} />;
+  mapInteractableItems(itemList) {
+    return itemList.map(item => {
+      return <this.InteractableListItem item={item} />;
     });
   }
 
-  SeizableListItem = (props: { item }) => (
-      <ion-item class={`seizable-item ${props.item.seized === true && 'seized'}`}
+  InteractableListItem = (props: { item }) => (
+      <ion-item class={`interactable-item ${props.item.IsIgnored === true && 'ignored'} ${props.item.IsSeized === true && 'seized'} ${props.item.IsTriaged === true && 'triaged'}`}
                 lines="full">
         <ion-thumbnail>
           <img alt={props.item.name} src={`./assets/images/${props.item.image}`}/>
@@ -187,14 +228,14 @@ export class VrMain {
           <h3>{props.item.name}</h3>
           <p>{props.item.info}</p>
         </ion-label>
-        {props.item.seized === true &&
-            <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+        {props.item.IsTriaged === true && <ion-icon color="dark" src={`./assets/ionicons/eye.svg`} slot="end"></ion-icon>}
+        {props.item.IsSeized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
   render() {
     return [
-      <div class="main">
+      <div class={`main ${this.reviewEnabled === true ? 'review-mode' : ''}`}>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end"
                  hidden={!this.reviewEnabled}>
           <ion-fab-button id="showMenu" onClick={e => this.toggleMenu(e)} color="light">
@@ -219,12 +260,23 @@ export class VrMain {
           </div>
 
           <nav class="outer-nav right vertical">
+            <ion-segment class="list-segment" value="all" onIonChange={e => this.changeItemList(e.detail.value)}>
+              <ion-segment-button value="all">
+                <ion-label>All</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="triaged">
+                <ion-label>Triaged</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="seized">
+                <ion-label>Seized</ion-label>
+              </ion-segment-button>
+            </ion-segment>
             <div>
-            {this.seizableItemList.length > 0 ?
+              {this.filteredItemList.length > 0 ?
                 <ion-list>
-                  {this.mapSeizableItems()}
+                  {this.filteredItemList}
                 </ion-list> :
-                <div class="no-items">No seizable items for {config.environments[this.activeEnvironment].name}</div>}
+                <div class="no-items">No {this.segmentSelectedName} items.</div>}
             </div>
           </nav>
 
