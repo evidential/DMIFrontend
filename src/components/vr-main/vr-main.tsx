@@ -161,7 +161,7 @@ export class VrMain {
     this.interactableItemList = [...this.interactableItemList];
     this.changeItemList(this.segmentSelectedName);
 
-    if (this.reviewEnabled === false) await this.presentToast(message);
+    if (this.reviewEnabled === false && message) await this.presentToast(message);
   }
 
   async setActiveEnvironment(id, showToast = true) {

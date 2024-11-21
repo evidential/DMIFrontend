@@ -85,6 +85,8 @@ export class VrScene {
       setTimeout(() => {
         if (itemData.IsSeized || itemData.IsTriaged || itemData.IsIgnored) {
           this.viewItem(itemData, true);
+        } else {
+          this.resetItem(itemData);
         }
       }, 100);
     }, 200, true));
@@ -382,7 +384,7 @@ export class VrScene {
       });
     }
 
-    if (this.reviewEnabled === false) {
+    if (this.reviewEnabled === false || itemInteractedWith === false) {
       setTimeout(() => {
         this.moveCameraToItem(itemMesh, cameraOverrides);
 
@@ -396,6 +398,26 @@ export class VrScene {
         }
       }, 100);
     }
+  }
+
+  resetItem(interactiveItem) {
+    const interactableItem = this.interactableItemList.find(item => item.ItemNumber === interactiveItem.ItemNumber);
+    const glbMeshID = interactableItem.glbID;
+    const itemMesh = this.scene.getObjectByName(replaceSpacesWithUnderscores(glbMeshID));
+
+    interactableItem.IsSeized = false;
+    interactableItem.IsTriaged = false;
+    interactableItem.IsIgnored = false;
+
+    this.highlightInteractedItem(itemMesh, false);
+
+    this.activeItemState = this.getitemState(interactableItem);
+    this.changeItemList('interactive');
+
+    this.itemInteractedWith.emit({
+      interactedWithItem: interactableItem,
+      message: ''
+    });
   }
 
   getitemState(item) {
