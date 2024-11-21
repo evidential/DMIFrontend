@@ -61,6 +61,7 @@ model-viewer {
     bottom: 0;
     width: 17vh;
     z-index: 1;
+    top: 10px;
 }
 
 .environment-link-name {
@@ -72,6 +73,7 @@ model-viewer {
 
 .environment-container {
     margin: 0 0 10px;
+    max-height: calc(100vh / 7);
 }
 
 .environment-container img {
