@@ -69,6 +69,11 @@ export class VrScene {
 
   @Watch('reviewEnabled')
   async reviewEnabledHandler() {
+    if (this.reviewEnabled === true) {
+      this.changeItemList('seized');
+    } else {
+      this.changeItemList('interactive');
+    }
     this.backToScene(true);
   }
 
@@ -120,7 +125,7 @@ export class VrScene {
   updateEnvironmentItems(environmentIndex: number) {
     const interactableItemsIds = config.environments.find(environment => environment.id === environmentIndex).interactableItems;
     this.environmentInteractableItemList = this.interactableItemList.filter(item => interactableItemsIds.includes(item.ItemNumber));
-    this.changeItemList('interactive');
+    this.changeItemList(this.segmentSelectedName);
   }
 
   setCamera(environmentIndex: number) {
@@ -374,7 +379,7 @@ export class VrScene {
       interactableItem.IsTriaged = interactiveItem.IsTriaged;
       this.activeItemState = this.getitemState(interactableItem);
 
-      this.changeItemList('interactive');
+      this.changeItemList(this.segmentSelectedName);
 
       this.highlightInteractedItem(itemMesh, true);
 
@@ -412,7 +417,7 @@ export class VrScene {
     this.highlightInteractedItem(itemMesh, false);
 
     this.activeItemState = this.getitemState(interactableItem);
-    this.changeItemList('interactive');
+    this.changeItemList(this.segmentSelectedName);
 
     this.itemInteractedWith.emit({
       interactedWithItem: interactableItem,
@@ -471,9 +476,8 @@ export class VrScene {
 
   changeItemList(value) {
     let itemList;
-
     switch(value) {
-      case 'all':
+      case 'interactive':
         this.segmentSelectedName = 'interactive';
         itemList = [...this.environmentInteractableItemList];
         break;
@@ -553,7 +557,7 @@ export class VrScene {
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
-              <ion-segment class="list-segment" value="seized"
+              <ion-segment class="list-segment" value={this.segmentSelectedName}
                            onIonChange={e => this.changeItemList(e.detail.value)}
                            hidden={!this.reviewEnabled}>
                 <ion-segment-button value="seized">
@@ -562,7 +566,7 @@ export class VrScene {
                 <ion-segment-button value="triaged">
                   <ion-label>Triaged</ion-label>
                 </ion-segment-button>
-                <ion-segment-button value="all">
+                <ion-segment-button value="interactive">
                   <ion-label>All</ion-label>
                 </ion-segment-button>
               </ion-segment>
