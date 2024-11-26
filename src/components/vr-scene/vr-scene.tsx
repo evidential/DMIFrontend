@@ -490,7 +490,9 @@ export class VrScene {
         });
         break;
       default:
-        itemList = [...this.environmentInteractableItemList];
+        itemList = this.environmentInteractableItemList.filter(item => {
+          return item.IsSeized === true;
+        });
     }
 
     this.filteredItemList = this.mapInteractableItems(itemList);
@@ -551,17 +553,17 @@ export class VrScene {
             <ion-card color="light">
               <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
-              <ion-segment class="list-segment" value="all"
+              <ion-segment class="list-segment" value="seized"
                            onIonChange={e => this.changeItemList(e.detail.value)}
                            hidden={!this.reviewEnabled}>
-                <ion-segment-button value="all">
-                  <ion-label>All</ion-label>
+                <ion-segment-button value="seized">
+                  <ion-label>Seized</ion-label>
                 </ion-segment-button>
                 <ion-segment-button value="triaged">
                   <ion-label>Triaged</ion-label>
                 </ion-segment-button>
-                <ion-segment-button value="seized">
-                  <ion-label>Seized</ion-label>
+                <ion-segment-button value="all">
+                  <ion-label>All</ion-label>
                 </ion-segment-button>
               </ion-segment>
               <div class="card-content">

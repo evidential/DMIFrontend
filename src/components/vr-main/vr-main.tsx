@@ -107,7 +107,7 @@ export class VrMain {
   resetSegment() {
     const segment = this.el.querySelector('ion-segment');
     if (segment) {
-      segment.value = 'all';
+      segment.value = 'seized';
     }
   }
 
@@ -199,7 +199,9 @@ export class VrMain {
         });
         break;
       default:
-        itemList = [...this.interactableItemList];
+        itemList = this.interactableItemList.filter(item => {
+          return item.IsSeized === true;
+        });
     }
 
     this.filteredItemList = this.mapInteractableItems(itemList);
@@ -268,15 +270,16 @@ export class VrMain {
           </div>
 
           <nav class="outer-nav right vertical">
-            <ion-segment class="list-segment" value="all" onIonChange={e => this.changeItemList(e.detail.value)}>
-              <ion-segment-button value="all">
-                <ion-label>All</ion-label>
+            <ion-segment class="list-segment" value="seized"
+                         onIonChange={e => this.changeItemList(e.detail.value)}>
+              <ion-segment-button value="seized">
+                <ion-label>Seized</ion-label>
               </ion-segment-button>
               <ion-segment-button value="triaged">
                 <ion-label>Triaged</ion-label>
               </ion-segment-button>
-              <ion-segment-button value="seized">
-                <ion-label>Seized</ion-label>
+              <ion-segment-button value="all">
+                <ion-label>All</ion-label>
               </ion-segment-button>
             </ion-segment>
             <div>
