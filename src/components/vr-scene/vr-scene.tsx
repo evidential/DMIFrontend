@@ -59,7 +59,7 @@ export class VrScene {
     setTimeout(() => {
       console.log('LOAD SCENE MODEL');
       this.loadSceneEnvironments();
-    }, 800);
+    }, 1200);
   }
 
   @Watch('activeEnvironment')
