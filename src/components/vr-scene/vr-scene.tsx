@@ -102,6 +102,7 @@ export class VrScene {
     const activeItem = this.el.querySelector('.active-item');
     const interactableItemList = this.el.querySelector('.interactable-item-list');
     this.interactableItemList = cloneDeep(config.interactableItems);
+    this.segmentSelectedName = 'interactive';
     this.updateEnvironmentItems(0);
 
     if (this.viewingItem === true) {
@@ -493,6 +494,12 @@ export class VrScene {
           return item.IsTriaged === true;
         });
         break;
+      case 'ignored':
+        this.segmentSelectedName = 'ignored';
+        itemList = this.environmentInteractableItemList.filter(item => {
+          return item.IsIgnored === true;
+        });
+        break;
       default:
         itemList = this.environmentInteractableItemList.filter(item => {
           return item.IsSeized === true;
@@ -519,6 +526,7 @@ export class VrScene {
         </ion-label>
         {props.item.IsTriaged === true && <ion-icon color="dark" src={`./assets/ionicons/eye.svg`} slot="end"></ion-icon>}
         {props.item.IsSeized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+        {props.item.IsIgnored === true && <ion-icon color="dark" src={`./assets/ionicons/eye-off.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
@@ -559,12 +567,16 @@ export class VrScene {
               <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
               <ion-segment class="list-segment" value={this.segmentSelectedName}
                            onIonChange={e => this.changeItemList(e.detail.value)}
-                           hidden={!this.reviewEnabled}>
+                           hidden={!this.reviewEnabled}
+                           mode="ios">
                 <ion-segment-button value="seized">
                   <ion-label>Seized</ion-label>
                 </ion-segment-button>
                 <ion-segment-button value="triaged">
                   <ion-label>Triaged</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="ignored">
+                  <ion-label>Ignored</ion-label>
                 </ion-segment-button>
                 <ion-segment-button value="interactive">
                   <ion-label>All</ion-label>

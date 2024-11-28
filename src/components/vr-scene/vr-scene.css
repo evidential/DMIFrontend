@@ -89,3 +89,7 @@
     position: absolute;
     z-index: 999;
 }
+
+vr-scene .list-segment {
+    margin: -4px 0 0 0;
+}

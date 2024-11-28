@@ -27,9 +27,8 @@ export class VrMain {
   @State() userEnvironment: number = 0;
   @State() interactableItemList: any[] = [];
   @State() filteredItemList: any[] = [];
-  @State() triagedItemList: any[] = [];
   @State() environmentLoaded: boolean = false;
-  @State() segmentSelectedName: string = 'interactive';
+  @State() segmentSelectedName: string = 'seized';
 
   @Listen('environmentLoaded')
   async environmentLoadedHandler() {
@@ -174,7 +173,7 @@ export class VrMain {
 
     switch(value) {
       case 'all':
-        this.segmentSelectedName = 'interactive';
+        this.segmentSelectedName = 'all';
         itemList = [...this.interactableItemList];
         break;
       case 'seized':
@@ -187,6 +186,12 @@ export class VrMain {
         this.segmentSelectedName = 'triaged';
         itemList = this.interactableItemList.filter(item => {
           return item.IsTriaged === true;
+        });
+        break;
+      case 'ignored':
+        this.segmentSelectedName = 'ignored';
+        itemList = this.interactableItemList.filter(item => {
+          return item.IsIgnored === true;
         });
         break;
       default:
@@ -225,7 +230,7 @@ export class VrMain {
     this.interactableItemList = cloneDeep(config.interactableItems);
     this.reviewEnabled = true;
     this.resetSegment();
-    this.changeItemList('interactive');
+    this.changeItemList('seized');
     await this.toggleReview();
     const vrScene = this.el.querySelector('vr-scene');
     if (vrScene) vrScene.resetScene();
@@ -270,6 +275,7 @@ export class VrMain {
         </ion-label>
         {props.item.IsTriaged === true && <ion-icon color="dark" src={`./assets/ionicons/eye.svg`} slot="end"></ion-icon>}
         {props.item.IsSeized === true && <ion-icon color="dark" src={`./assets/ionicons/briefcase.svg`} slot="end"></ion-icon>}
+        {props.item.IsIgnored === true && <ion-icon color="dark" src={`./assets/ionicons/eye-off.svg`} slot="end"></ion-icon>}
       </ion-item>
   );
 
@@ -301,12 +307,16 @@ export class VrMain {
 
           <nav class="outer-nav right vertical">
             <ion-segment class="list-segment" value="seized"
-                         onIonChange={e => this.changeItemList(e.detail.value)}>
+                         onIonChange={e => this.changeItemList(e.detail.value)}
+                         mode="ios">
               <ion-segment-button value="seized">
                 <ion-label>Seized</ion-label>
               </ion-segment-button>
               <ion-segment-button value="triaged">
                 <ion-label>Triaged</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="ignored">
+                <ion-label>Ignored</ion-label>
               </ion-segment-button>
               <ion-segment-button value="all">
                 <ion-label>All</ion-label>
@@ -321,7 +331,11 @@ export class VrMain {
             </div>
           </nav>
 
-          <ion-button size="large" shape="round" class="refresh-button" onClick={() => this.resetVR()}>
+          <ion-button hidden={!this.environmentLoaded}
+                      size="large"
+                      shape="round"
+                      class="refresh-button"
+                      onClick={() => this.resetVR()}>
             Restart VR
             <ion-icon slot="end" name="refresh-circle"></ion-icon>
           </ion-button>
