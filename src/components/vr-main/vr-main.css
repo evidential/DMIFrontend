@@ -88,12 +88,20 @@ model-viewer {
     opacity: 1;
 }
 
+.refresh-button {
+    height: 46px;
+    width: 250px;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+}
+
 .review-toggle-button {
     height: 46px;
     width: 250px;
     position: absolute;
     left: calc(50% - 60px);
-    bottom: 20px;
+    bottom: 10px;
 }
 
 /* Modal view */

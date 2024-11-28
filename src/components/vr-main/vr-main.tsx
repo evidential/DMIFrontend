@@ -1,5 +1,5 @@
 import {Component, State, h, Element, Listen} from '@stencil/core';
-import {toastController} from "@ionic/core";
+import {alertController, toastController} from "@ionic/core";
 import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
 import { cloneDeep } from 'lodash';
@@ -68,16 +68,7 @@ export class VrMain {
     }, 500, true));
 
     this.socket.on('reset for new user', debounce(async () => {
-      this.activeEnvironment = 0;
-      this.userEnvironment = 0;
-      this.interactableItemList = cloneDeep(config.interactableItems);
-      this.reviewEnabled = true;
-      this.resetSegment();
-      this.changeItemList('interactive');
-      await this.toggleReview();
-      const vrScene = this.el.querySelector('vr-scene');
-      if (vrScene) vrScene.resetScene();
-      await this.presentToast('New user session in progress');
+      await this.resetVRConfirmed();
     }, 500, true));
   }
 
@@ -207,6 +198,45 @@ export class VrMain {
     this.filteredItemList = this.mapInteractableItems(itemList);
   }
 
+  async showResetVRAlert() {
+    const alert = await alertController.create({
+      header: `Reset scenario?`,
+      message: 'Are you sure you want to reset the scenario in the VR headset?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'dark'
+        },
+        {
+          cssClass: 'dark',
+          text: 'OK',
+          handler: () => this.resetVRConfirmed()
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async resetVRConfirmed() {
+    this.activeEnvironment = 0;
+    this.userEnvironment = 0;
+    this.interactableItemList = cloneDeep(config.interactableItems);
+    this.reviewEnabled = true;
+    this.resetSegment();
+    this.changeItemList('interactive');
+    await this.toggleReview();
+    const vrScene = this.el.querySelector('vr-scene');
+    if (vrScene) vrScene.resetScene();
+    await this.presentToast('New user session in progress');
+    this.socket.emit('reset vr');
+  }
+
+  async resetVR() {
+    await this.showResetVRAlert();
+  }
+
   mapEnvironments() {
     return config.environments.map(environment => {
       let activeEnvironment = '';
@@ -290,6 +320,11 @@ export class VrMain {
                 <div class="no-items">No {this.segmentSelectedName} items.</div>}
             </div>
           </nav>
+
+          <ion-button size="large" shape="round" class="refresh-button" onClick={() => this.resetVR()}>
+            Restart VR
+            <ion-icon slot="end" name="refresh-circle"></ion-icon>
+          </ion-button>
 
           <ion-button class={`review-toggle-button ${this.reviewEnabled === true ? 'review-toggle-button--enabled' : 'review-toggle-button--disabled'}`}
                       onClick={() => this.toggleReview()}
