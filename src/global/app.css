@@ -33,8 +33,8 @@
 :root {
   /** Colour Scheme */
 
-  --ion-color-primary: #ffc409;
-  --ion-color-primary-rgb: 255, 196, 9;
+  --ion-color-primary: #3aa8d3;
+  --ion-color-primary-rgb: 58, 168, 211;
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
   --ion-color-primary-shade: #e0ac08;

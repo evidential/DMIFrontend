@@ -17,6 +17,7 @@ export class VrMain {
   initialDelay: number = 7000;
   elapsedTime: number = 0;
   socket = null;
+  activeSessions: any[] = [];
 
   @Element() el: HTMLElement;
 
@@ -29,6 +30,7 @@ export class VrMain {
   @State() filteredItemList: any[] = [];
   @State() environmentLoaded: boolean = false;
   @State() segmentSelectedName: string = 'seized';
+  @State() viewMode: string = 'live';
 
   @Listen('environmentLoaded')
   async environmentLoadedHandler() {
@@ -242,6 +244,51 @@ export class VrMain {
     await this.showResetVRAlert();
   }
 
+  updateViewMode(viewMode) {
+    this.viewMode = viewMode;
+  }
+
+  async viewLiveSessions() {
+    const actionSheet = document.createElement('ion-action-sheet');
+
+    if (this.activeSessions.length < 1) {
+      const alert = document.createElement('ion-alert');
+      alert.header = 'No active sessions';
+      alert.message = 'The VR manager app is currently not connected to any user sessions.';
+      alert.buttons = ['OK'];
+
+      document.body.appendChild(alert);
+      return await alert.present();
+    }
+
+    actionSheet.header = 'Active sessions';
+    actionSheet.buttons = [
+      {
+        text: 'Delete',
+        role: 'destructive',
+        data: {
+          action: 'delete',
+        },
+      },
+      {
+        text: 'Share',
+        data: {
+          action: 'share',
+        },
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        data: {
+          action: 'cancel',
+        },
+      },
+    ];
+
+    document.body.appendChild(actionSheet);
+    await actionSheet.present();
+  }
+
   mapEnvironments() {
     return config.environments.map(environment => {
       let activeEnvironment = '';
@@ -291,7 +338,40 @@ export class VrMain {
 
         <div id="perspective" class="perspective effect-rotateleft">
           <div class="container" onClick={e => this.menuOpen === true && this.toggleMenu(e)}>
-            <div id="sceneWrapper" class="wrapper">
+            <div class="side-menu-wrapper">
+              <div class="side-menu">
+                <nav class="sidebar-group">
+                  <ion-button class={this.viewMode === 'live' && 'active'}
+                              title="View active session" fill="clear"
+                              onClick={() => this.updateViewMode('live')}>
+                    <ion-icon aria-hidden="true" name="videocam-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button class={this.viewMode === 'review' && 'active'}
+                              title="Review previous sessions" fill="clear"
+                              onClick={() => this.updateViewMode('review')}>
+                    <ion-icon aria-hidden="true" name="calendar-number-outline"></ion-icon>
+                  </ion-button>
+                </nav>
+
+                <nav class="sidebar-sub-group" hidden={this.viewMode !== 'live'}>
+                  <ion-button id="ViewLiveSessions"
+                              class={this.viewMode === 'live' && 'active'}
+                              title="View live sessions" fill="clear"
+                              onClick={() => this.viewLiveSessions()}>
+                    <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
+                  </ion-button>
+                </nav>
+              </div>
+            </div>
+
+
+            <div class="review-sessions" hidden={this.viewMode === 'live'}>
+              <div class="date-picker">
+                Date
+              </div>
+            </div>
+
+            <div id="sceneWrapper" class="wrapper" hidden={this.viewMode === 'review'}>
               <div class="environment-navigation"
                    hidden={!this.reviewEnabled}>
                 {this.mapEnvironments()}
@@ -343,7 +423,7 @@ export class VrMain {
           <ion-button class={`review-toggle-button ${this.reviewEnabled === true ? 'review-toggle-button--enabled' : 'review-toggle-button--disabled'}`}
                       onClick={() => this.toggleReview()}
                       color={this.reviewEnabled === true ? 'primary' : 'light'}
-                      hidden={!this.environmentLoaded}>
+                      hidden>
             {this.reviewEnabled === true ? 'Disable' : 'Enable'} Review Mode
             <ion-icon name={this.reviewEnabled === true ? 'stats-chart' : 'stats-chart-outline'}
                       slot="end"
