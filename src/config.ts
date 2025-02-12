@@ -1,239 +1,239 @@
 const config =  {
   version: '1.3.0',
-  /*socketServerURL: '//evidentialrealityserver.com',*/
-  socketServerURL: '//192.168.0.31:8080',
-  s3Bucket: 'https://dmi-frontend.s3.eu-west-2.amazonaws.com/',
-  envirinmentModel: 'House.glb',
-  environments: [
-    {
-      id: 0,
-      name: 'Outside Back',
-      cameraPosition: {
-        x: 7.5,
-        y: 1.5,
-        z: 4.7
-      },
-      cameraRotation: {
-        x: 6,
-        y: 36,
-        z: 0
-      },
-      model: '',
-      image: 'environment6.jpg',
-      interactableItems: [48]
-    },
-    {
-      id: 1,
-      name: 'Kitchen/Diner',
-      cameraPosition: {
-        x: -1.6,
-        y: 1.5,
-        z: 0
-      },
-      cameraRotation: {
-        x: -5,
-        y: 244,
-        z: 0
-      },
-      model: '',
-      image: 'environment2.jpg',
-      interactableItems: [0,1,2,3,6,8,11,13,23,22,24,25,26,27,28,31,32,33,34,35,36,43,46,47,49,53,54,56,58,59,60,61,62,63,64,65,72,73,74]
-    },
-    {
-      id: 2,
-      name: 'Back Room',
-      cameraPosition: {
-        x: 3.635,
-        y: 1.5,
-        z: 0.984
-      },
-      cameraRotation: {
-        x: -19,
-        y: 212,
-        z: 0
-      },
-      model: '',
-      image: 'environment3.jpg',
-      interactableItems: [4,5,7,9,14,15,16,17,18,19,21,39,40,41,42,45,50,51,57,66,69,70,71]
-    },
-    {
-      id: 3,
-      name: 'Cot Room',
-      cameraPosition: {
-        x: -0.832,
-        y: 4.34,
-        z: 4.101
-      },
-      cameraRotation: {
-        x: -10,
-        y: 54,
-        z: 0
-      },
-      model: '',
-      image: 'environment4.jpg',
-      interactableItems: [12,29]
-    },
-    {
-      id: 4,
-      name: 'Bathroom',
-      cameraPosition: {
-        x: -3.427,
-        y: 4.34,
-        z: 0.136
-      },
-      cameraRotation: {
-        x: -19,
-        y: -3.6,
-        z: 0
-      },
-      model: '',
-      image: 'environment5.jpg',
-      interactableItems: [44]
-    },
-    {
-      id: 5,
-      name: 'Outside',
-      cameraPosition: {
-        x: -1.5,
-        y: 1.5,
-        z: -4.3
-      },
-      cameraRotation: {
-        x: 9,
-        y: 320,
-        z: 0
-      },
-      model: 'House.glb',
-      image: 'environment1.jpg',
-      interactableItems: [20,30,37,38,52,55,68]
-    }
-  ],
-  interactableItems: [
-    {
-      ItemNumber: 0,
-      glbID: 'Amazon_Echo_Show_10',
-      name: 'Amazon Echo Show',
-      info: 'Amazon Echo Show 10.',
-      image: 'item0.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 1,
-      glbID: 'Amazon_Ordering_Device_Holder',
-      name: 'Device Holder',
-      info: 'Amazon Ordering Device Holder',
-      image: 'item1.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 2,
-      glbID: 'Apple_Air_Tag_Box',
-      name: 'Air Tracker',
-      info: 'Apple Air Tag Box.',
-      image: 'item2.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 3,
-      glbID: 'Macbook_Laptop',
-      name: 'Macbook',
-      info: 'Apple Macbook Laptop.',
-      image: 'item3.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 4,
-      glbID: 'Apple_Watch_01a_Open_Strap',
-      name: 'Black Watch',
-      info: 'Black Apple Watch.',
-      image: 'item4.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 5,
-      glbID: 'Apple_Watch_01a_Closed_Strap',
-      name: 'Grey Watch',
-      info: 'Grey Apple Watch.',
-      image: 'item5.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 6,
-      glbID: 'PF_USB_Bag_01a',
-      name: 'USB Sticks',
-      info: 'Bag_of USB Sticks.',
-      image: 'item6.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 7,
-      glbID: 'PowerBank',
-      name: 'Power Bank',
-      info: 'Black Power Bank.',
-      image: 'item7.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    {
-      ItemNumber: 8,
-      glbID: 'SM_Book_C',
-      name: 'Book By Robert Louis Stevenson',
-      info: 'Dr Jekyll & Mr Hyde.',
-      image: 'item8.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: {
-        depth: -0.6,
-        up: -0.3
-      }
-    },
-    {
-      ItemNumber: 9,
-      glbID: 'BT_Router_Hub_6',
-      name: 'BT Router',
-      info: 'Type A BT Router Hub 6.',
-      image: 'item9.png',
-      IsSeized: false,
-      IsTriaged: false,
-      IsIgnored: false,
-      cameraOverrides: null
-    },
-    /*{
-      ItemNumber: 10,
-      glbID: 'Burglar_Alarm_A',
-      name: 'Burglar Alarms',
-      info: 'Burglar Alarms.',
-      image: 'item10.png',
-      seized: false,
-      cameraOverrides: {
-        depth: -0.5,
-        up: 0.2
-      }
-    },*/
+  socketServerURL: '//evidentialrealityserver.com',
+/*socketServerURL: '//192.168.0.31:8080',*/
+s3Bucket: 'https://dmi-frontend.s3.eu-west-2.amazonaws.com/',
+envirinmentModel: 'House.glb',
+environments: [
+  {
+	id: 0,
+	name: 'Outside Back',
+	cameraPosition: {
+	  x: 7.5,
+	  y: 1.5,
+	  z: 4.7
+	},
+	cameraRotation: {
+	  x: 6,
+	  y: 36,
+	  z: 0
+	},
+	model: '',
+	image: 'environment6.jpg',
+	interactableItems: [48]
+  },
+  {
+	id: 1,
+	name: 'Kitchen/Diner',
+	cameraPosition: {
+	  x: -1.6,
+	  y: 1.5,
+	  z: 0
+	},
+	cameraRotation: {
+	  x: -5,
+	  y: 244,
+	  z: 0
+	},
+	model: '',
+	image: 'environment2.jpg',
+	interactableItems: [0,1,2,3,6,8,11,13,23,22,24,25,26,27,28,31,32,33,34,35,36,43,46,47,49,53,54,56,58,59,60,61,62,63,64,65,72,73,74]
+  },
+  {
+	id: 2,
+	name: 'Back Room',
+	cameraPosition: {
+	  x: 3.635,
+	  y: 1.5,
+	  z: 0.984
+	},
+	cameraRotation: {
+	  x: -19,
+	  y: 212,
+	  z: 0
+	},
+	model: '',
+	image: 'environment3.jpg',
+	interactableItems: [4,5,7,9,14,15,16,17,18,19,21,39,40,41,42,45,50,51,57,66,69,70,71]
+  },
+  {
+	id: 3,
+	name: 'Cot Room',
+	cameraPosition: {
+	  x: -0.832,
+	  y: 4.34,
+	  z: 4.101
+	},
+	cameraRotation: {
+	  x: -10,
+	  y: 54,
+	  z: 0
+	},
+	model: '',
+	image: 'environment4.jpg',
+	interactableItems: [12,29]
+  },
+  {
+	id: 4,
+	name: 'Bathroom',
+	cameraPosition: {
+	  x: -3.427,
+	  y: 4.34,
+	  z: 0.136
+	},
+	cameraRotation: {
+	  x: -19,
+	  y: -3.6,
+	  z: 0
+	},
+	model: '',
+	image: 'environment5.jpg',
+	interactableItems: [44]
+  },
+  {
+	id: 5,
+	name: 'Outside',
+	cameraPosition: {
+	  x: -1.5,
+	  y: 1.5,
+	  z: -4.3
+	},
+	cameraRotation: {
+	  x: 9,
+	  y: 320,
+	  z: 0
+	},
+	model: 'House.glb',
+	image: 'environment1.jpg',
+	interactableItems: [20,30,37,38,52,55,68]
+  }
+],
+interactableItems: [
+  {
+	ItemNumber: 0,
+	glbID: 'Amazon_Echo_Show_10',
+	name: 'Amazon Echo Show',
+	info: 'Amazon Echo Show 10.',
+	image: 'item0.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 1,
+	glbID: 'Amazon_Ordering_Device_Holder',
+	name: 'Device Holder',
+	info: 'Amazon Ordering Device Holder',
+	image: 'item1.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 2,
+	glbID: 'Apple_Air_Tag_Box',
+	name: 'Air Tracker',
+	info: 'Apple Air Tag Box.',
+	image: 'item2.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 3,
+	glbID: 'Macbook_Laptop',
+	name: 'Macbook',
+	info: 'Apple Macbook Laptop.',
+	image: 'item3.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 4,
+	glbID: 'Apple_Watch_01a_Open_Strap',
+	name: 'Black Watch',
+	info: 'Black Apple Watch.',
+	image: 'item4.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 5,
+	glbID: 'Apple_Watch_01a_Closed_Strap',
+	name: 'Grey Watch',
+	info: 'Grey Apple Watch.',
+	image: 'item5.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 6,
+	glbID: 'PF_USB_Bag_01a',
+	name: 'USB Sticks',
+	info: 'Bag_of USB Sticks.',
+	image: 'item6.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 7,
+	glbID: 'PowerBank',
+	name: 'Power Bank',
+	info: 'Black Power Bank.',
+	image: 'item7.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  {
+	ItemNumber: 8,
+	glbID: 'SM_Book_C',
+	name: 'Book By Robert Louis Stevenson',
+	info: 'Dr Jekyll & Mr Hyde.',
+	image: 'item8.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: {
+	  depth: -0.6,
+	  up: -0.3
+	}
+  },
+  {
+	ItemNumber: 9,
+	glbID: 'BT_Router_Hub_6',
+	name: 'BT Router',
+	info: 'Type A BT Router Hub 6.',
+	image: 'item9.png',
+	IsSeized: false,
+	IsTriaged: false,
+	IsIgnored: false,
+	cameraOverrides: null
+  },
+  /*{
+	ItemNumber: 10,
+	glbID: 'Burglar_Alarm_A',
+	name: 'Burglar Alarms',
+	info: 'Burglar Alarms.',
+	image: 'item10.png',
+	seized: false,
+	cameraOverrides: {
+	  depth: -0.5,
+	  up: 0.2
+	}
+  },*/
     {
       ItemNumber: 11,
       glbID: 'Computer_System',
