@@ -1628,3 +1628,9 @@ body::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   outline: 1px solid slategrey;
 }
+
+/* Action Sheet style */
+.action-sheet-button.active {
+  color: var(--ion-color-primary);
+  font-weight: bold;
+}

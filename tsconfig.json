@@ -9,6 +9,7 @@
       "es2017",
       "es2021"
     ],
+    "types": ["node"],
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
@@ -16,7 +17,8 @@
     "noUnusedParameters": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": [
     "src",

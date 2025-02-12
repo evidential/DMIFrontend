@@ -17,6 +17,12 @@
           "appId": "dfd8fg09cwfgk",
           "type": "cicd"
         }
+      },
+      "auth": {
+        "dmifrontend066ca2ce": {}
+      },
+      "storage": {
+        "EvitaReview": {}
       }
     }
   }

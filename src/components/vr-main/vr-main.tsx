@@ -2,6 +2,7 @@ import {Component, State, h, Element, Listen} from '@stencil/core';
 import {alertController, toastController} from "@ionic/core";
 import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
+
 import { cloneDeep } from 'lodash';
 import { io } from '../../assets/scripts/libraries/socketio-4.7.5.js';
 
@@ -24,10 +25,12 @@ export class VrMain {
   @State() reviewEnabled: boolean = false;
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
+  @State() activeCollarID: number;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() interactableItemList: any[] = [];
   @State() filteredItemList: any[] = [];
+  @State() observingSession: boolean = false;
   @State() environmentLoaded: boolean = false;
   @State() segmentSelectedName: string = 'seized';
   @State() viewMode: string = 'live';
@@ -35,6 +38,10 @@ export class VrMain {
   @Listen('environmentLoaded')
   async environmentLoadedHandler() {
     this.environmentLoaded = true;
+
+    if (this.activeSessions.length > 0 && !this.activeCollarID) {
+      await this.viewLiveSessions();
+    }
   }
 
   @Listen('itemInteractedWith')
@@ -43,11 +50,11 @@ export class VrMain {
   }
 
   async componentWillLoad() {
-    this.interactableItemList = cloneDeep(config.interactableItems);
     this.setupSocket();
   }
 
   async componentDidLoad() {
+    this.socket.emit('get active sessions');
     this.changeItemList(this.segmentSelectedName);
     this.startSplashTimer();
   }
@@ -58,19 +65,80 @@ export class VrMain {
       secure: true
     });
 
+    this.socket.on('active sessions retrieved', debounce(async activeSessions => {
+      this.activeSessions = activeSessions;
+    }, 500, true));
+
+    this.socket.on('session started', debounce(async sessionData => {
+      await this.sessionStarted(sessionData);
+    }, 500, true));
+
+    this.socket.on('session ended', debounce(async activeSessions => {
+      await this.sessionEnded(activeSessions);
+    }, 500, true));
+
     this.socket.on('teleported to area', debounce(async areaData => {
       if (this.reviewEnabled === false) {
-        if (this.activeEnvironment !== areaData.AreaIndex) {
+        if (this.activeCollarID === areaData.collarID && this.activeEnvironment !== areaData.AreaIndex) {
           await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+          this.activeEnvironment = areaData.AreaIndex;
         }
-        this.activeEnvironment = areaData.AreaIndex;
       }
-      this.userEnvironment = areaData.AreaIndex;
+
+      const sessionData = this.activeSessions.find(session => session.ClientId === areaData.ClientId);
+      if (sessionData) sessionData.AreaIndex = this.userEnvironment = areaData.AreaIndex;
     }, 500, true));
 
     this.socket.on('reset for new user', debounce(async () => {
       await this.resetVRConfirmed();
     }, 500, true));
+  }
+
+  async sessionStarted(sessionData) {
+    const interactableItemList = this.interactableItemList = cloneDeep(config.interactableItems);
+    sessionData = {...sessionData, interactableItemList};
+    this.activeSessions = [...this.activeSessions, sessionData];
+
+    if (this.activeSessions.length <= 1) {
+      await this.switchToSession(sessionData);
+      await this.presentToast(`Observing user session for Collar ID: ${sessionData.collarID}.`);
+    } else {
+      const alert = await alertController.create({
+        header: `User session started.`,
+        message: `Do you want to observe the user session for Collar ID: ${sessionData.collarID} ?`,
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            cssClass: 'dark'
+          },
+          {
+            cssClass: 'dark',
+            text: 'Yes',
+            handler: async () => await this.switchToSession(sessionData)
+          }
+        ]
+      });
+      await alert.present();
+    }
+  }
+
+  async sessionEnded(activeSessions) {
+    this.activeCollarID = undefined;
+    this.activeSessions = activeSessions;
+    this.activeEnvironment = 0;
+    this.userEnvironment = 0;
+    this.observingSession = false;
+    this.interactableItemList = cloneDeep(config.interactableItems);
+    this.resetSegment();
+    this.changeItemList('seized');
+    const vrScene = this.el.querySelector('vr-scene');
+    if (vrScene) vrScene.resetScene();
+    await this.presentToast('User session ended');
+
+    if (this.activeSessions.length > 0) {
+      await this.viewLiveSessions();
+    }
   }
 
   startSplashTimer() {
@@ -153,12 +221,21 @@ export class VrMain {
     this.interactableItemList = [...this.interactableItemList];
     this.changeItemList(this.segmentSelectedName);
 
-    if (this.reviewEnabled === false && message) await this.presentToast(message);
+    if (this.reviewEnabled === false && message) {
+      await this.presentToast(message);
+    }
   }
 
   async setActiveEnvironment(id, showToast = true) {
     this.activeEnvironment = id;
     if (showToast) await this.presentToast(`User moved to ${config.environments[this.activeEnvironment].name}`);
+  }
+
+  async switchToSession(sessionData) {
+    this.observingSession = true;
+    this.activeCollarID = sessionData.collarID;
+    this.activeEnvironment = sessionData.AreaIndex;
+    this.interactableItemList = sessionData.interactableItemList;
   }
 
   async toggleReview() {
@@ -207,8 +284,8 @@ export class VrMain {
 
   async showResetVRAlert() {
     const alert = await alertController.create({
-      header: `Reset scenario?`,
-      message: 'Are you sure you want to reset the scenario in the VR headset?',
+      header: `Reset scenario and save for review?`,
+      message: `Are you sure you want to save the session and restart the scenario for collar ID: ${this.activeCollarID} in the VR headset?`,
       buttons: [
         {
           text: 'Cancel',
@@ -227,17 +304,8 @@ export class VrMain {
   }
 
   async resetVRConfirmed() {
-    this.activeEnvironment = 0;
-    this.userEnvironment = 0;
-    this.interactableItemList = cloneDeep(config.interactableItems);
-    this.reviewEnabled = true;
-    this.resetSegment();
-    this.changeItemList('seized');
-    await this.toggleReview();
-    const vrScene = this.el.querySelector('vr-scene');
-    if (vrScene) vrScene.resetScene();
-    await this.presentToast('New user session in progress');
-    this.socket.emit('reset vr');
+    const activeSession = this.activeSessions.find(session => session.collarID === this.activeCollarID);
+    this.socket.emit('reset vr', activeSession);
   }
 
   async resetVR() {
@@ -249,6 +317,12 @@ export class VrMain {
   }
 
   async viewLiveSessions() {
+    // Check if an action sheet is already open
+    const existingActionSheet = document.querySelector('ion-action-sheet');
+    if (existingActionSheet) {
+      await existingActionSheet.dismiss();
+    }
+
     const actionSheet = document.createElement('ion-action-sheet');
 
     if (this.activeSessions.length < 1) {
@@ -263,26 +337,17 @@ export class VrMain {
 
     actionSheet.header = 'Active sessions';
     actionSheet.buttons = [
-      {
-        text: 'Delete',
-        role: 'destructive',
-        data: {
-          action: 'delete',
-        },
-      },
-      {
-        text: 'Share',
-        data: {
-          action: 'share',
-        },
-      },
+      ...this.activeSessions.map(sessionData => ({
+        text: `Collar ID: ${sessionData.collarID}`,
+        cssClass: sessionData.collarID === this.activeCollarID ? 'active' : '',
+        handler: () => {
+          this.switchToSession(sessionData);
+        }
+      })),
       {
         text: 'Cancel',
-        role: 'cancel',
-        data: {
-          action: 'cancel',
-        },
-      },
+        role: 'cancel'
+      }
     ];
 
     document.body.appendChild(actionSheet);
@@ -327,6 +392,7 @@ export class VrMain {
   );
 
   render() {
+    console.log(this.activeSessions.length);
     return [
       <div class={`main ${this.reviewEnabled === true ? 'review-mode' : ''}`}>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end"
@@ -360,10 +426,16 @@ export class VrMain {
                               onClick={() => this.viewLiveSessions()}>
                     <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
                   </ion-button>
+                  <ion-button id="ViewLiveSessions"
+                              title={`End VR session for Collar ID: ${this.activeCollarID}`}
+                              fill="clear"
+                              onClick={() => this.resetVR()}
+                              hidden={!this.activeCollarID}>
+                    <ion-icon aria-hidden="true" name="save-outline"></ion-icon>
+                  </ion-button>
                 </nav>
               </div>
             </div>
-
 
             <div class="review-sessions" hidden={this.viewMode === 'live'}>
               <div class="date-picker">
@@ -371,7 +443,9 @@ export class VrMain {
               </div>
             </div>
 
-            <div id="sceneWrapper" class="wrapper" hidden={this.viewMode === 'review'}>
+            <div id="sceneWrapper"
+                 class={`wrapper ${this.observingSession === false ? 'wrapper--hidden' : ''}`}
+                 hidden={this.viewMode === 'review'}>
               <div class="environment-navigation"
                    hidden={!this.reviewEnabled}>
                 {this.mapEnvironments()}
@@ -380,6 +454,7 @@ export class VrMain {
                         userEnvironment={this.userEnvironment}
                         showSplash={this.showSplash}
                         reviewEnabled={this.reviewEnabled}
+                        activeCollarID={this.activeCollarID}
                         socket={this.socket}/>
 
             </div>
@@ -404,21 +479,26 @@ export class VrMain {
             </ion-segment>
             <div>
               {this.filteredItemList.length > 0 ?
-                <ion-list>
-                  {this.filteredItemList}
-                </ion-list> :
-                <div class="no-items">No {this.segmentSelectedName} items.</div>}
+                  <ion-list>
+                    {this.filteredItemList}
+                  </ion-list> :
+                  <div class="no-items">No {this.segmentSelectedName} items.</div>}
             </div>
           </nav>
 
-          <ion-button hidden={!this.environmentLoaded}
-                      size="large"
-                      shape="round"
-                      class="refresh-button"
-                      onClick={() => this.resetVR()}>
-            Restart VR
-            <ion-icon slot="end" name="refresh-circle"></ion-icon>
-          </ion-button>
+          <div class="session-info-container" hidden={this.environmentLoaded === false}>
+            <div class="session-info">
+              {this.activeCollarID ? (
+                  <div>
+                    Observing collar ID: <span>{this.activeCollarID}</span>
+                  </div>
+              ) : (
+                  <div>
+                    {this.observingSession === false ? 'Not currently observing a VR Session.' : 'Waiting for a VR Session to commence..'}
+                  </div>
+              )}
+            </div>
+          </div>
 
           <ion-button class={`review-toggle-button ${this.reviewEnabled === true ? 'review-toggle-button--enabled' : 'review-toggle-button--disabled'}`}
                       onClick={() => this.toggleReview()}

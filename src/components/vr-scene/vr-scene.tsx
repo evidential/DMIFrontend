@@ -46,6 +46,7 @@ export class VrScene {
   @Prop() userEnvironment: number;
   @Prop() socket: any;
   @Prop() reviewEnabled: boolean;
+  @Prop() activeCollarID: number;
 
   @Event() environmentLoaded: EventEmitter;
   @Event() itemInteractedWith: EventEmitter;
@@ -221,8 +222,10 @@ export class VrScene {
           // All resources have been loaded
           console.log('All resources loaded');
           setTimeout(() => {
+            const scene: HTMLElement = document.querySelector('a-scene');
             environmentLoadingEl.classList.add('environment-loading--loaded');
             aFrameSceneEl.classList.remove('aframe-scene--loading');
+            scene.offsetHeight;
             this.environmentLoaded.emit();
           }, 2000);
         })
@@ -532,85 +535,85 @@ export class VrScene {
 
   render() {
     return [
-        <div class="scene-container">
+      <div class="scene-container">
 
-          <div class="environment-loading">
-            <div class="environment-loading-message">Loading House</div>
-            <div id="ldBar1" class="ldBar"></div>
-            <div class="initialising-message initialising-hidden">
-              <div>Initialising App</div>
-              <ion-spinner name="dots"></ion-spinner>
-            </div>
+        <div class="environment-loading">
+          <div class="environment-loading-message">Loading House</div>
+          <div id="ldBar1" class="ldBar"></div>
+          <div class="initialising-message initialising-hidden">
+            <div>Initialising App</div>
+            <ion-spinner name="dots"></ion-spinner>
           </div>
-
-          <div id="itemOverlay" class="item-overlay item-overlay--hidden"
-               hidden={this.reviewEnabled}></div>
-
-          <div class={`interactable-item-card active-item ${this.activeItemState}`}>
-            <ion-card color="light">
-              <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-              <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
-              <ion-card-content>
-                <img class="active-item-image" src={`./assets/images/${this.activeItemImage}`} />
-                <h3>{this.activeItemName}</h3>
-                <p>{this.activeItemInfo}</p>
-              </ion-card-content>
-              <ion-button id="backButton" onClick={() => this.backToScene(true)} expand="full" color="dark">Back
-                <ion-icon src={`./assets/ionicons/caret-back.svg`} slot="start"/>
-              </ion-button>
-            </ion-card>
-          </div>
-
-          <div class="interactable-item-card interactable-item-list">
-            <ion-card color="light">
-              <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-              <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
-              <ion-segment class="list-segment" value={this.segmentSelectedName}
-                           onIonChange={e => this.changeItemList(e.detail.value)}
-                           hidden={!this.reviewEnabled}
-                           mode="ios">
-                <ion-segment-button value="seized">
-                  <ion-label>Seized</ion-label>
-                </ion-segment-button>
-                <ion-segment-button value="triaged">
-                  <ion-label>Triaged</ion-label>
-                </ion-segment-button>
-                <ion-segment-button value="ignored">
-                  <ion-label>Ignored</ion-label>
-                </ion-segment-button>
-                <ion-segment-button value="interactive">
-                  <ion-label>All</ion-label>
-                </ion-segment-button>
-              </ion-segment>
-              <div class="card-content">
-                {this.filteredItemList.length > 0 ?
-                <ion-list>
-                  {this.filteredItemList}
-                </ion-list> :
-                <div class="no-items">No {this.segmentSelectedName} items for {config.environments[this.activeEnvironment].name}</div>}
-              </div>
-            </ion-card>
-          </div>
-
-          <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
-            <a-assets>
-              <a-asset-item id="sceneModel" src={`${config.s3Bucket}${config.envirinmentModel}`}></a-asset-item>
-              <img id="sky" src={`./assets/images/skybox-night.png`}/>
-            </a-assets>
-
-            <a-entity light="type: ambient; color: #BBB; intensity: 0.7;"></a-entity>
-            <a-entity light="type: directional; color: #fff; intensity: 1.0" position="-56 35 -1"></a-entity>
-
-            <a-sky class="skybox" src="#sky"></a-sky>
-            <a-entity id="rig" position={this.cameraPosition} rotation="0 5 0">
-              <a-entity id="camera" camera="active: true;" position="0 0 0" touch-look-controls></a-entity>
-            </a-entity>
-
-            <a-entity id="animationRig" position={this.cameraPosition} rotation="0 5 0">
-              <a-entity id="animationCamera" camera="active: false;" position="0 0 0"></a-entity>
-            </a-entity>
-          </a-scene>
         </div>
+
+        <div id="itemOverlay" class="item-overlay item-overlay--hidden"
+             hidden={this.reviewEnabled}></div>
+
+        <div class={`interactable-item-card active-item ${this.activeItemState}`}>
+          <ion-card color="light">
+            <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
+            <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
+            <ion-card-content>
+              <img class="active-item-image" src={`./assets/images/${this.activeItemImage}`} />
+              <h3>{this.activeItemName}</h3>
+              <p>{this.activeItemInfo}</p>
+            </ion-card-content>
+            <ion-button id="backButton" onClick={() => this.backToScene(true)} expand="full" color="dark">Back
+              <ion-icon src={`./assets/ionicons/caret-back.svg`} slot="start"/>
+            </ion-button>
+          </ion-card>
+        </div>
+
+        <div class="interactable-item-card interactable-item-list" hidden={!this.activeCollarID}>
+          <ion-card color="light">
+            <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
+            <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
+            <ion-segment class="list-segment" value={this.segmentSelectedName}
+                         onIonChange={e => this.changeItemList(e.detail.value)}
+                         hidden={!this.reviewEnabled}
+                         mode="ios">
+              <ion-segment-button value="seized">
+                <ion-label>Seized</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="triaged">
+                <ion-label>Triaged</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="ignored">
+                <ion-label>Ignored</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="interactive">
+                <ion-label>All</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+            <div class="card-content">
+              {this.filteredItemList.length > 0 ?
+                  <ion-list>
+                    {this.filteredItemList}
+                  </ion-list> :
+                  <div class="no-items">No {this.segmentSelectedName} items for {config.environments[this.activeEnvironment].name}</div>}
+            </div>
+          </ion-card>
+        </div>
+
+        <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
+          <a-assets>
+            <a-asset-item id="sceneModel" src={`${config.s3Bucket}${config.envirinmentModel}`}></a-asset-item>
+            <img id="sky" src={`./assets/images/skybox-night.png`}/>
+          </a-assets>
+
+          <a-entity light="type: ambient; color: #BBB; intensity: 0.7;"></a-entity>
+          <a-entity light="type: directional; color: #fff; intensity: 1.0" position="-56 35 -1"></a-entity>
+
+          <a-sky class="skybox" src="#sky"></a-sky>
+          <a-entity id="rig" position={this.cameraPosition} rotation="0 5 0">
+            <a-entity id="camera" camera="active: true;" position="0 0 0" touch-look-controls></a-entity>
+          </a-entity>
+
+          <a-entity id="animationRig" position={this.cameraPosition} rotation="0 5 0">
+            <a-entity id="animationCamera" camera="active: false;" position="0 0 0"></a-entity>
+          </a-entity>
+        </a-scene>
+      </div>
     ];
   }
 }

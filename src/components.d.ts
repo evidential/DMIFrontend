@@ -11,6 +11,7 @@ export namespace Components {
     interface VrRoot {
     }
     interface VrScene {
+        "activeCollarID": number;
         "activeEnvironment": number;
         "resetScene": () => Promise<void>;
         "reviewEnabled": boolean;
@@ -54,6 +55,7 @@ declare namespace LocalJSX {
     interface VrRoot {
     }
     interface VrScene {
+        "activeCollarID"?: number;
         "activeEnvironment"?: number;
         "onEnvironmentLoaded"?: (event: VrSceneCustomEvent<any>) => void;
         "onItemInteractedWith"?: (event: VrSceneCustomEvent<any>) => void;

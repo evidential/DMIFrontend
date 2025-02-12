@@ -94,6 +94,11 @@
     color: #fff;
     height: 100vh;
     width: 100vw;
+    transition: opacity 600ms ease-in-out;
+}
+
+.wrapper--hidden {
+    opacity: 0;
 }
 
 model-viewer {
@@ -481,4 +486,33 @@ ion-toast {
 
 .interactable-item.ignored ion-label {
     background-image: url(../assets/images/ignored.png);
+}
+
+.session-info-container {
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    right: 0;
+}
+
+.session-info {
+    background-color: var(--ion-color-light);
+    border: 3px solid black;
+    border-bottom: 0 none;
+    border-radius: 8px 8px 0 0;
+    height: 60px;
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 24px;
+}
+
+.session-info span {
+    font-weight: 700;
 }
