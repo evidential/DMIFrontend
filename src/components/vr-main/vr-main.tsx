@@ -2,8 +2,6 @@ import {Component, State, h, Element, Listen} from '@stencil/core';
 import {alertController, toastController} from "@ionic/core";
 import {config} from "../../config";
 import {debounce} from "../../assets/scripts/utils";
-
-import { cloneDeep } from 'lodash';
 import { io } from '../../assets/scripts/libraries/socketio-4.7.5.js';
 
 @Component({
@@ -30,6 +28,7 @@ export class VrMain {
   @State() userEnvironment: number = 0;
   @State() interactableItemList: any[] = [];
   @State() filteredItemList: any[] = [];
+  @State() environments: any[] = [];
   @State() observingSession: boolean = false;
   @State() environmentLoaded: boolean = false;
   @State() segmentSelectedName: string = 'seized';
@@ -54,6 +53,7 @@ export class VrMain {
   }
 
   async componentDidLoad() {
+    this.socket.emit('get environment data');
     this.socket.emit('get active sessions');
     this.changeItemList(this.segmentSelectedName);
     this.startSplashTimer();
@@ -64,6 +64,11 @@ export class VrMain {
       transports: ['websocket', 'polling'],
       secure: true
     });
+
+    this.socket.on('environment data retrieved', debounce(async data => {
+      this.environments = [...data.environments];
+      this.interactableItemList = data.interactableItems;
+    }, 500, true));
 
     this.socket.on('active sessions retrieved', debounce(async activeSessions => {
       this.activeSessions = activeSessions;
@@ -80,7 +85,7 @@ export class VrMain {
     this.socket.on('teleported to area', debounce(async areaData => {
       if (this.reviewEnabled === false) {
         if (this.activeCollarID === areaData.collarID && this.activeEnvironment !== areaData.AreaIndex) {
-          await this.presentToast(`User has moved to ${config.environments[areaData.AreaIndex].name}`);
+          await this.presentToast(`User has moved to ${this.environments[areaData.AreaIndex].name}`);
           this.activeEnvironment = areaData.AreaIndex;
         }
       }
@@ -95,8 +100,6 @@ export class VrMain {
   }
 
   async sessionStarted(sessionData) {
-    const interactableItemList = this.interactableItemList = cloneDeep(config.interactableItems);
-    sessionData = {...sessionData, interactableItemList};
     this.activeSessions = [...this.activeSessions, sessionData];
 
     if (this.activeSessions.length <= 1) {
@@ -124,17 +127,16 @@ export class VrMain {
   }
 
   async sessionEnded(activeSessions) {
+    await this.presentToast(`VR session for collar ID: ${this.activeCollarID} ended`);
     this.activeCollarID = undefined;
     this.activeSessions = activeSessions;
     this.activeEnvironment = 0;
     this.userEnvironment = 0;
     this.observingSession = false;
-    this.interactableItemList = cloneDeep(config.interactableItems);
     this.resetSegment();
     this.changeItemList('seized');
     const vrScene = this.el.querySelector('vr-scene');
     if (vrScene) vrScene.resetScene();
-    await this.presentToast('User session ended');
 
     if (this.activeSessions.length > 0) {
       await this.viewLiveSessions();
@@ -228,7 +230,7 @@ export class VrMain {
 
   async setActiveEnvironment(id, showToast = true) {
     this.activeEnvironment = id;
-    if (showToast) await this.presentToast(`User moved to ${config.environments[this.activeEnvironment].name}`);
+    if (showToast) await this.presentToast(`User moved to ${this.environments[this.activeEnvironment].name}`);
   }
 
   async switchToSession(sessionData) {
@@ -355,17 +357,18 @@ export class VrMain {
   }
 
   mapEnvironments() {
-    return config.environments.map(environment => {
+    if (this.environments.length < 1) return [];
+    return this.environments.map(environment => {
       let activeEnvironment = '';
-      if (environment.id === this.activeEnvironment) activeEnvironment = 'environment-active';
+      if (environment.ItemNumber === this.activeEnvironment) activeEnvironment = 'environment-active';
       return <this.EnvironmentLink environment={environment} activeEnvironment={activeEnvironment}/>;
     });
   }
 
   EnvironmentLink = (props: { environment, activeEnvironment}) => (
       <div class="environment-container" onClick={() => this.setActiveEnvironment(props.environment.id, false)}>
-        <div class="environment-link-name">{`${config.environments[props.environment.id].name}`}</div>
-        <img class={props.activeEnvironment} src={`../assets/images/${config.environments[props.environment.id].image}`} />
+        <div class="environment-link-name">{`${this.environments[props.environment.id].name}`}</div>
+        <img class={props.activeEnvironment} src={`../assets/images/${this.environments[props.environment.id].image}`} />
       </div>
   );
 
@@ -451,6 +454,8 @@ export class VrMain {
                 {this.mapEnvironments()}
               </div>
               <vr-scene activeEnvironment={this.activeEnvironment}
+                        environments={this.environments}
+                        interactableItemList={this.interactableItemList}
                         userEnvironment={this.userEnvironment}
                         showSplash={this.showSplash}
                         reviewEnabled={this.reviewEnabled}

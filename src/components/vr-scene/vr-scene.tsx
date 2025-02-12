@@ -4,7 +4,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {config} from "../../config";
 import {debounce, replaceSpacesWithUnderscores} from "../../assets/scripts/utils";
-import { cloneDeep } from 'lodash';
 
 declare const AFRAME;
 declare const THREE;
@@ -36,7 +35,6 @@ export class VrScene {
   @State() activeItemImage: string = '';
   @State() cameraPosition: string = '';
   @State() cameraRotation: string = '';
-  @State() interactableItemList: any[] = [];
   @State() environmentInteractableItemList: any[] = [];
   @State() filteredItemList: any[] = [];
   @State() segmentSelectedName: string = 'interactive';
@@ -47,6 +45,8 @@ export class VrScene {
   @Prop() socket: any;
   @Prop() reviewEnabled: boolean;
   @Prop() activeCollarID: number;
+  @Prop() environments: any[] = [];
+  @Prop() interactableItemList: any[] = [];
 
   @Event() environmentLoaded: EventEmitter;
   @Event() itemInteractedWith: EventEmitter;
@@ -68,6 +68,11 @@ export class VrScene {
     this.changeEnvironment(this.activeEnvironment);
   }
 
+  @Watch('interactableItemList')
+  async interactableItemListHandler() {
+    this.updateEnvironmentItems(this.activeEnvironment);
+  }
+
   @Watch('reviewEnabled')
   async reviewEnabledHandler() {
     if (this.reviewEnabled === true) {
@@ -79,7 +84,6 @@ export class VrScene {
   }
 
   async componentWillLoad() {
-    this.interactableItemList = cloneDeep(config.interactableItems);
     this.updateEnvironmentItems(0);
   }
 
@@ -100,9 +104,9 @@ export class VrScene {
 
   @Method()
   async resetScene() {
+    this.socket.emit('get environment data');
     const activeItem = this.el.querySelector('.active-item');
     const interactableItemList = this.el.querySelector('.interactable-item-list');
-    this.interactableItemList = cloneDeep(config.interactableItems);
     this.segmentSelectedName = 'interactive';
     this.updateEnvironmentItems(0);
 
@@ -125,17 +129,19 @@ export class VrScene {
   }
 
   updateEnvironmentItems(environmentIndex: number) {
-    const interactableItemsIds = config.environments.find(environment => environment.id === environmentIndex).interactableItems;
+    if (this.environments.length < 1) return;
+    const interactableItemsIds = this.environments.find(environment => environment.id === environmentIndex).interactableItems;
     this.environmentInteractableItemList = this.interactableItemList.filter(item => interactableItemsIds.includes(item.ItemNumber));
     this.changeItemList(this.segmentSelectedName);
   }
 
   setCamera(environmentIndex: number) {
+    if (this.environments.length < 1) return;
     const camera: any = this.el.querySelector('#camera');
     const animationRig: any = this.el.querySelector('#animationRig');
     const animationCamera: any = this.el.querySelector('#animationCamera');
-    const cameraPosition = config.environments[environmentIndex].cameraPosition;
-    const cameraRotation = config.environments[environmentIndex].cameraRotation;
+    const cameraPosition = this.environments[environmentIndex].cameraPosition;
+    const cameraRotation = this.environments[environmentIndex].cameraRotation;
     this.cameraPosition = `${cameraPosition.x} ${cameraPosition.y} ${cameraPosition.z}`;
     const touchLookControls = camera.components['touch-look-controls'];
 
@@ -190,7 +196,7 @@ export class VrScene {
 
     loader.setDRACOLoader(dracoLoader);
 
-    const promises: Promise<void>[] = config.environments.map(environment => {
+    const promises: Promise<void>[] = this.environments.map(environment => {
       return new Promise<void>((resolve, reject) => {
         if (environment.model === '') {
           resolve();
@@ -198,7 +204,7 @@ export class VrScene {
         }
 
         loader.load(
-            `${config.s3Bucket}${config.envirinmentModel}`,
+            `${config.s3Bucket}${config.environmentModel}`,
             gltf => {
               gltf.scene.userData = {
                 environmentId: environment.id
@@ -389,7 +395,7 @@ export class VrScene {
 
       this.itemInteractedWith.emit({
         interactedWithItem: interactableItem,
-        message: `${itemName} ${ this.getitemState(interactableItem)} from ${config.environments[this.userEnvironment].name}`
+        message: `${itemName} ${ this.getitemState(interactableItem)} from ${this.environments[this.userEnvironment]?.name}`
       });
     }
 
@@ -551,8 +557,8 @@ export class VrScene {
 
         <div class={`interactable-item-card active-item ${this.activeItemState}`}>
           <ion-card color="light">
-            <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-            <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
+            <ion-label class="environment-name">{`${this.environments[this.activeEnvironment]?.name}`}</ion-label>
+            <img src={`./assets/images/${this.environments[this.activeEnvironment]?.image}`}/>
             <ion-card-content>
               <img class="active-item-image" src={`./assets/images/${this.activeItemImage}`} />
               <h3>{this.activeItemName}</h3>
@@ -566,8 +572,8 @@ export class VrScene {
 
         <div class="interactable-item-card interactable-item-list" hidden={!this.activeCollarID}>
           <ion-card color="light">
-            <ion-label class="environment-name">{`${config.environments[this.activeEnvironment].name}`}</ion-label>
-            <img src={`./assets/images/${config.environments[this.activeEnvironment].image}`}/>
+            <ion-label class="environment-name">{`${this.environments[this.activeEnvironment]?.name}`}</ion-label>
+            <img src={`./assets/images/${this.environments[this.activeEnvironment]?.image}`}/>
             <ion-segment class="list-segment" value={this.segmentSelectedName}
                          onIonChange={e => this.changeItemList(e.detail.value)}
                          hidden={!this.reviewEnabled}
@@ -590,14 +596,14 @@ export class VrScene {
                   <ion-list>
                     {this.filteredItemList}
                   </ion-list> :
-                  <div class="no-items">No {this.segmentSelectedName} items for {config.environments[this.activeEnvironment].name}</div>}
+                  <div class="no-items">No {this.segmentSelectedName} items for {this.environments[this.activeEnvironment]?.name}</div>}
             </div>
           </ion-card>
         </div>
 
         <a-scene id="scene" class="aframe-scene aframe-scene--loading" scene-ready>
           <a-assets>
-            <a-asset-item id="sceneModel" src={`${config.s3Bucket}${config.envirinmentModel}`}></a-asset-item>
+            <a-asset-item id="sceneModel" src={`${config.s3Bucket}${config.environmentModel}`}></a-asset-item>
             <img id="sky" src={`./assets/images/skybox-night.png`}/>
           </a-assets>
 

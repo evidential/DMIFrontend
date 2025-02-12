@@ -13,6 +13,8 @@ export namespace Components {
     interface VrScene {
         "activeCollarID": number;
         "activeEnvironment": number;
+        "environments": any[];
+        "interactableItemList": any[];
         "resetScene": () => Promise<void>;
         "reviewEnabled": boolean;
         "showSplash": boolean;
@@ -57,6 +59,8 @@ declare namespace LocalJSX {
     interface VrScene {
         "activeCollarID"?: number;
         "activeEnvironment"?: number;
+        "environments"?: any[];
+        "interactableItemList"?: any[];
         "onEnvironmentLoaded"?: (event: VrSceneCustomEvent<any>) => void;
         "onItemInteractedWith"?: (event: VrSceneCustomEvent<any>) => void;
         "onTeleportedEnvironment"?: (event: VrSceneCustomEvent<any>) => void;
