@@ -263,7 +263,7 @@ export class VrMain {
     }
     this.observingSession = true;
     this.activeCollarID = sessionData.collarID;
-    this.activeEnvironment = this.userEnvironment = sessionData.AreaIndex;
+    this.activeEnvironment = this.userEnvironment = this.reviewEnabled ? 0 : sessionData.AreaIndex;
     this.interactableItemList = sessionData.interactableItemList;
   }
 
@@ -498,7 +498,10 @@ export class VrMain {
               </div>
               <div class="review-list">
                 <ion-list inset={true} lines="full">
-                  {this.mapEndedSessions()}
+                  {this.endedSessions.length > 0 ? this.mapEndedSessions() :
+                  <ion-item>
+                    <ion-skeleton-text animated={true} />
+                  </ion-item>}
                 </ion-list>
               </div>
             </div>
@@ -522,7 +525,7 @@ export class VrMain {
           </div>
 
           <nav class="outer-nav right vertical">
-            <ion-segment class="list-segment" value="seized"
+            <ion-segment class="list-segment" value="all"
                          onIonChange={e => this.changeItemList(e.detail.value)}
                          mode="ios">
               <ion-segment-button value="seized">

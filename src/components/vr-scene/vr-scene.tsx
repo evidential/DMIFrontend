@@ -75,11 +75,7 @@ export class VrScene {
 
   @Watch('reviewEnabled')
   async reviewEnabledHandler() {
-    if (this.reviewEnabled === true) {
-      this.changeItemList('all');
-    } else {
-      this.changeItemList('interactive');
-    }
+    this.changeItemList('interactive');
     this.backToScene(true);
   }
 
