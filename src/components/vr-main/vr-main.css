@@ -516,3 +516,14 @@ ion-toast {
 .session-info span {
     font-weight: 700;
 }
+
+.review-sessions {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    padding: 20px 20px 20px 80px;
+}
+
+.review-sessions ion-item {
+    cursor: pointer;
+}

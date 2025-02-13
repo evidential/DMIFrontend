@@ -44,7 +44,7 @@ export class VrScene {
   @Prop() userEnvironment: number;
   @Prop() socket: any;
   @Prop() reviewEnabled: boolean;
-  @Prop() activeCollarID: number;
+  @Prop() activeCollarID: string;
   @Prop() environments: any[] = [];
   @Prop() interactableItemList: any[] = [];
 
@@ -76,7 +76,7 @@ export class VrScene {
   @Watch('reviewEnabled')
   async reviewEnabledHandler() {
     if (this.reviewEnabled === true) {
-      this.changeItemList('seized');
+      this.changeItemList('all');
     } else {
       this.changeItemList('interactive');
     }
@@ -92,11 +92,14 @@ export class VrScene {
     this.changeItemList(this.segmentSelectedName);
 
     this.socket.on('item updated', debounce(itemData => {
+
       setTimeout(() => {
-        if (itemData.IsSeized || itemData.IsTriaged || itemData.IsIgnored) {
-          this.viewItem(itemData, true);
-        } else {
-          this.resetItem(itemData);
+        if (this.activeCollarID === itemData.collarID) {
+          if (itemData.IsSeized || itemData.IsTriaged || itemData.IsIgnored) {
+            this.viewItem(itemData, true);
+          } else {
+            this.resetItem(itemData);
+          }
         }
       }, 100);
     }, 200, true));

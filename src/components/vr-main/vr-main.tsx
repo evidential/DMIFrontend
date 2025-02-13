@@ -23,15 +23,16 @@ export class VrMain {
   @State() reviewEnabled: boolean = false;
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
-  @State() activeCollarID: number;
+  @State() activeCollarID: string;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() interactableItemList: any[] = [];
   @State() filteredItemList: any[] = [];
   @State() environments: any[] = [];
+  @State() endedSessions: any[] = [];
   @State() observingSession: boolean = false;
   @State() environmentLoaded: boolean = false;
-  @State() segmentSelectedName: string = 'seized';
+  @State() segmentSelectedName: string = 'all';
   @State() viewMode: string = 'live';
 
   @Listen('environmentLoaded')
@@ -65,6 +66,15 @@ export class VrMain {
       secure: true
     });
 
+    this.socket.on('disconnect', () => {
+      console.log('Socket disconnected, attempting to reconnect...');
+    });
+
+    this.socket.on('connect', () => {
+      console.log('Socket reconnected, requesting current sessions...');
+      this.socket.emit('get active sessions');
+    });
+
     this.socket.on('environment data retrieved', debounce(async data => {
       this.environments = [...data.environments];
       this.interactableItemList = data.interactableItems;
@@ -74,17 +84,21 @@ export class VrMain {
       this.activeSessions = activeSessions;
     }, 500, true));
 
+    this.socket.on('ended sessions retrieved', debounce(async endedSessions => {
+      this.endedSessions = endedSessions;
+    }, 500, true));
+
     this.socket.on('session started', debounce(async sessionData => {
       await this.sessionStarted(sessionData);
     }, 500, true));
 
     this.socket.on('session ended', debounce(async activeSessions => {
-      await this.sessionEnded(activeSessions);
+      await this.sessionEnded(activeSessions, true);
     }, 500, true));
 
     this.socket.on('teleported to area', debounce(async areaData => {
       if (this.reviewEnabled === false) {
-        if (this.activeCollarID === areaData.collarID && this.activeEnvironment !== areaData.AreaIndex) {
+        if (this.activeCollarID === areaData.collarID && this.activeEnvironment !== areaData.AreaIndex && this.viewMode === 'live') {
           await this.presentToast(`User has moved to ${this.environments[areaData.AreaIndex].name}`);
           this.activeEnvironment = areaData.AreaIndex;
         }
@@ -102,10 +116,18 @@ export class VrMain {
   async sessionStarted(sessionData) {
     this.activeSessions = [...this.activeSessions, sessionData];
 
+    if (this.viewMode === 'review' || this.reviewEnabled === true) return;
+
     if (this.activeSessions.length <= 1) {
-      await this.switchToSession(sessionData);
+      await this.switchToSession(sessionData, 'live');
       await this.presentToast(`Observing user session for Collar ID: ${sessionData.collarID}.`);
     } else {
+      // Check if an alert is already open
+      const existingAlert = document.querySelector('ion-alert');
+      if (existingAlert) {
+        await existingAlert.dismiss();
+      }
+
       const alert = await alertController.create({
         header: `User session started.`,
         message: `Do you want to observe the user session for Collar ID: ${sessionData.collarID} ?`,
@@ -118,7 +140,7 @@ export class VrMain {
           {
             cssClass: 'dark',
             text: 'Yes',
-            handler: async () => await this.switchToSession(sessionData)
+            handler: async () => await this.switchToSession(sessionData, 'live')
           }
         ]
       });
@@ -126,19 +148,19 @@ export class VrMain {
     }
   }
 
-  async sessionEnded(activeSessions) {
-    await this.presentToast(`VR session for collar ID: ${this.activeCollarID} ended`);
+  async sessionEnded(activeSessions, notify: boolean) {
+    if (this.viewMode === 'review') return;
     this.activeCollarID = undefined;
     this.activeSessions = activeSessions;
     this.activeEnvironment = 0;
     this.userEnvironment = 0;
     this.observingSession = false;
     this.resetSegment();
-    this.changeItemList('seized');
+    this.changeItemList('all');
     const vrScene = this.el.querySelector('vr-scene');
     if (vrScene) vrScene.resetScene();
-
-    if (this.activeSessions.length > 0) {
+    if (notify) {
+      await this.presentToast(`VR session for collar ID: ${this.activeCollarID} ended`);
       await this.viewLiveSessions();
     }
   }
@@ -169,7 +191,7 @@ export class VrMain {
   resetSegment() {
     const segment = this.el.querySelector('ion-segment');
     if (segment) {
-      segment.value = 'seized';
+      segment.value = 'all';
     }
   }
 
@@ -233,10 +255,15 @@ export class VrMain {
     if (showToast) await this.presentToast(`User moved to ${this.environments[this.activeEnvironment].name}`);
   }
 
-  async switchToSession(sessionData) {
+  async switchToSession(sessionData, viewMode) {
+    if (viewMode === 'live') {
+      this.reviewEnabled = false;
+    } else if (viewMode === 'review') {
+      this.reviewEnabled = true;
+    }
     this.observingSession = true;
     this.activeCollarID = sessionData.collarID;
-    this.activeEnvironment = sessionData.AreaIndex;
+    this.activeEnvironment = this.userEnvironment = sessionData.AreaIndex;
     this.interactableItemList = sessionData.interactableItemList;
   }
 
@@ -314,7 +341,13 @@ export class VrMain {
     await this.showResetVRAlert();
   }
 
-  updateViewMode(viewMode) {
+  async updateViewMode(viewMode) {
+    if (viewMode === 'live') {
+      this.reviewEnabled = false;
+      await this.sessionEnded(this.activeSessions, false);
+    } else if (viewMode === 'review') {
+      this.socket.emit('get ended sessions');
+    }
     this.viewMode = viewMode;
   }
 
@@ -343,7 +376,7 @@ export class VrMain {
         text: `Collar ID: ${sessionData.collarID}`,
         cssClass: sessionData.collarID === this.activeCollarID ? 'active' : '',
         handler: () => {
-          this.switchToSession(sessionData);
+          this.switchToSession(sessionData, 'live');
         }
       })),
       {
@@ -354,6 +387,18 @@ export class VrMain {
 
     document.body.appendChild(actionSheet);
     await actionSheet.present();
+  }
+
+  async setReviewSessionData(sessionData) {
+    this.viewMode = 'live';
+    this.reviewEnabled = true;
+    await this.switchToSession(sessionData, 'review');
+  }
+
+  mapEndedSessions() {
+    return this.endedSessions.map(item => {
+      return <this.ReviewableListItem item={item} />;
+    });
   }
 
   mapEnvironments() {
@@ -394,8 +439,15 @@ export class VrMain {
       </ion-item>
   );
 
+  ReviewableListItem = (props: { item }) => (
+      <ion-item onClick={async () => this.setReviewSessionData(props.item)}>
+        <ion-label>
+          Collar ID: {props.item.collarID}
+        </ion-label>
+      </ion-item>
+  );
+
   render() {
-    console.log(this.activeSessions.length);
     return [
       <div class={`main ${this.reviewEnabled === true ? 'review-mode' : ''}`}>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end"
@@ -410,19 +462,19 @@ export class VrMain {
             <div class="side-menu-wrapper">
               <div class="side-menu">
                 <nav class="sidebar-group">
-                  <ion-button class={this.viewMode === 'live' && 'active'}
+                  <ion-button class={this.viewMode === 'live' ? 'active' : ''}
                               title="View active session" fill="clear"
                               onClick={() => this.updateViewMode('live')}>
                     <ion-icon aria-hidden="true" name="videocam-outline"></ion-icon>
                   </ion-button>
-                  <ion-button class={this.viewMode === 'review' && 'active'}
+                  <ion-button class={this.viewMode === 'review' === true ? 'active' : ''}
                               title="Review previous sessions" fill="clear"
                               onClick={() => this.updateViewMode('review')}>
                     <ion-icon aria-hidden="true" name="calendar-number-outline"></ion-icon>
                   </ion-button>
                 </nav>
 
-                <nav class="sidebar-sub-group" hidden={this.viewMode !== 'live'}>
+                <nav class="sidebar-sub-group" hidden={this.viewMode === 'review'}>
                   <ion-button id="ViewLiveSessions"
                               class={this.viewMode === 'live' && 'active'}
                               title="View live sessions" fill="clear"
@@ -433,7 +485,7 @@ export class VrMain {
                               title={`End VR session for Collar ID: ${this.activeCollarID}`}
                               fill="clear"
                               onClick={() => this.resetVR()}
-                              hidden={!this.activeCollarID}>
+                              hidden={!this.activeCollarID || this.reviewEnabled === true}>
                     <ion-icon aria-hidden="true" name="save-outline"></ion-icon>
                   </ion-button>
                 </nav>
@@ -443,6 +495,11 @@ export class VrMain {
             <div class="review-sessions" hidden={this.viewMode === 'live'}>
               <div class="date-picker">
                 Date
+              </div>
+              <div class="review-list">
+                <ion-list inset={true} lines="full">
+                  {this.mapEndedSessions()}
+                </ion-list>
               </div>
             </div>
 
@@ -461,7 +518,6 @@ export class VrMain {
                         reviewEnabled={this.reviewEnabled}
                         activeCollarID={this.activeCollarID}
                         socket={this.socket}/>
-
             </div>
           </div>
 
@@ -491,11 +547,11 @@ export class VrMain {
             </div>
           </nav>
 
-          <div class="session-info-container" hidden={this.environmentLoaded === false}>
+          <div class="session-info-container" hidden={this.viewMode === 'review' || this.showSplash === true}>
             <div class="session-info">
               {this.activeCollarID ? (
                   <div>
-                    Observing collar ID: <span>{this.activeCollarID}</span>
+                    {this.reviewEnabled === true ? 'Reviewing' : 'Observing'} collar ID: <span>{this.activeCollarID}</span>
                   </div>
               ) : (
                   <div>

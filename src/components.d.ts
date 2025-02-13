@@ -11,7 +11,7 @@ export namespace Components {
     interface VrRoot {
     }
     interface VrScene {
-        "activeCollarID": number;
+        "activeCollarID": string;
         "activeEnvironment": number;
         "environments": any[];
         "interactableItemList": any[];
@@ -57,7 +57,7 @@ declare namespace LocalJSX {
     interface VrRoot {
     }
     interface VrScene {
-        "activeCollarID"?: number;
+        "activeCollarID"?: string;
         "activeEnvironment"?: number;
         "environments"?: any[];
         "interactableItemList"?: any[];
