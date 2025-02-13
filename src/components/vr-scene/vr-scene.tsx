@@ -405,8 +405,8 @@ export class VrScene {
         if (this.viewingItem === false) {
           this.viewingItem = !this.viewingItem;
 
-          activeItem.classList.toggle('flipped');
           interactableItemList.classList.toggle('flipped');
+          activeItem.classList.toggle('flipped');
 
           this.toggleItemOverlay();
         }

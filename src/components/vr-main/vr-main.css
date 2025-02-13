@@ -267,6 +267,9 @@ model-viewer {
     top: 0;
     z-index: 1;
     --background: #fff;
+    transition: transform 1500ms ease;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .list-segment ion-segment-button {
@@ -338,7 +341,8 @@ ion-toast {
     backface-visibility: hidden;
 }
 
-.interactable-item-card.active-item {
+.interactable-item-card.active-item,
+.interactable-item-card.flipped ion-segment.list-segment {
     transform: perspective(1000px) rotateY(180deg);
 }
 
