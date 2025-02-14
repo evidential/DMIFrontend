@@ -122,7 +122,6 @@ export class VrMain {
       await this.switchToSession(sessionData, 'live');
       await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
     } else {
-      // Check if an alert is already open
       const existingAlert = document.querySelector('ion-alert');
       if (existingAlert) {
         await existingAlert.dismiss();
@@ -150,7 +149,6 @@ export class VrMain {
 
   async sessionEnded(activeSessions, notify: boolean) {
     if (this.viewMode === 'review') return;
-    this.activeCollarID = undefined;
     this.activeSessions = activeSessions;
     this.activeEnvironment = 0;
     this.userEnvironment = 0;
@@ -163,6 +161,7 @@ export class VrMain {
       await this.presentToast(`VR session for collar ID: ${this.activeCollarID} ended`);
       await this.viewLiveSessions();
     }
+    this.activeCollarID = undefined;
   }
 
   startSplashTimer() {
@@ -265,6 +264,7 @@ export class VrMain {
     this.activeCollarID = sessionData.collarID;
     this.activeEnvironment = this.userEnvironment = this.reviewEnabled ? 0 : sessionData.AreaIndex;
     this.interactableItemList = sessionData.interactableItemList;
+    this.filteredItemList = this.mapInteractableItems(this.interactableItemList);
   }
 
   async toggleReview() {
@@ -312,6 +312,12 @@ export class VrMain {
   }
 
   async showResetVRAlert() {
+
+    const existingAlert = document.querySelector('ion-alert');
+    if (existingAlert) {
+      await existingAlert.dismiss();
+    }
+
     const alert = await alertController.create({
       header: `Reset scenario and save for review?`,
       message: `Are you sure you want to save the session and restart the scenario for collar ID: ${this.activeCollarID} in the VR headset?`,
@@ -361,6 +367,12 @@ export class VrMain {
     const actionSheet = document.createElement('ion-action-sheet');
 
     if (this.activeSessions.length < 1) {
+
+      const existingAlert = document.querySelector('ion-alert');
+      if (existingAlert) {
+        await existingAlert.dismiss();
+      }
+
       const alert = document.createElement('ion-alert');
       alert.header = 'No active sessions';
       alert.message = 'The VR manager app is currently not connected to any user sessions.';
