@@ -336,25 +336,28 @@ ion-toast {
     right: 20px;
     top: 0;
     z-index: 2;
-    transition: transform 1500ms ease;
+    transition: transform 1500ms ease, opacity 750ms ease;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
 
-.interactable-item-card.active-item,
-.interactable-item-card.flipped ion-segment.list-segment {
-    transform: perspective(1000px) rotateY(180deg);
+.interactable-item-card.active-item {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(180deg) translateZ(1px);
 }
 
 .interactable-item-card.active-item.flipped {
+    opacity: 1;
     transform: perspective(1000px) rotateY(0deg);
 }
 
 .interactable-item-card.interactable-item-list {
+    opacity: 1;
     transform: perspective(1000px) rotateY(0deg);
 }
 
 .interactable-item-card.interactable-item-list.flipped {
+    opacity: 0;
     transform: perspective(1000px) rotateY(-180deg);
 }
 
