@@ -350,3 +350,16 @@ body::-webkit-scrollbar-thumb {
   color: var(--ion-color-primary);
   font-weight: bold;
 }
+
+/* Date Picker */
+ion-datetime {
+  --background: #fff;
+  --background-rgb: 255, 255, 255;
+
+  border-radius: 16px;
+  box-shadow: rgba(var(--ion-color-primary-rgb), 0.3) 0 10px 15px -3px;
+}
+
+ion-datetime::part(calendar-day) {
+  color: var(--ion-color-primary);
+}

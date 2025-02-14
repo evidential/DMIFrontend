@@ -534,3 +534,26 @@ ion-toast {
 .review-sessions ion-item {
     cursor: pointer;
 }
+
+.date-picker {
+    padding: 14px;
+}
+
+.date-picker-and-results {
+    align-items: center;
+    display: flex;
+    padding: 30px 6px;
+}
+
+.review-list {
+    height: 350px;
+    overflow-y: hidden;
+    flex: 1;
+}
+
+.date-picker-and-results .review-list ion-list {
+    border-radius: 16px;
+    margin: 0 0 0 40px;
+    height: 100%;
+    overflow-y: scroll;
+}

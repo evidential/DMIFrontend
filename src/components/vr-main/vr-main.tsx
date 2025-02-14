@@ -505,16 +505,24 @@ export class VrMain {
             </div>
 
             <div class="review-sessions" hidden={this.viewMode === 'live'}>
-              <div class="date-picker">
-                Date
-              </div>
-              <div class="review-list">
-                <ion-list inset={true} lines="full">
-                  {this.endedSessions.length > 0 ? this.mapEndedSessions() :
-                  <ion-item>
-                    <ion-skeleton-text animated={true} />
-                  </ion-item>}
-                </ion-list>
+              <div class="review-search-container">
+                <div class="collar-id-search">
+                  <ion-searchbar placeholder="Enter Collar ID"/>
+                </div>
+                <div class="date-picker-and-results">
+                  <ion-datetime presentation="date" color="primary"></ion-datetime>
+                  <div class="review-list">
+                    <ion-list inset={true} lines="full">
+                      {this.endedSessions.length > 0 ? this.mapEndedSessions() :
+                          Array.from({ length: 8 }).map((_, index) => (
+                              <ion-item key={index}>
+                                <ion-skeleton-text animated={true} />
+                              </ion-item>
+                          ))
+                      }
+                    </ion-list>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -575,16 +583,6 @@ export class VrMain {
               )}
             </div>
           </div>
-
-          <ion-button class={`review-toggle-button ${this.reviewEnabled === true ? 'review-toggle-button--enabled' : 'review-toggle-button--disabled'}`}
-                      onClick={() => this.toggleReview()}
-                      color={this.reviewEnabled === true ? 'primary' : 'light'}
-                      hidden>
-            {this.reviewEnabled === true ? 'Disable' : 'Enable'} Review Mode
-            <ion-icon name={this.reviewEnabled === true ? 'stats-chart' : 'stats-chart-outline'}
-                      slot="end"
-                      aria-hidden="true" />
-          </ion-button>
 
         </div>
 
