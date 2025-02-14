@@ -17,6 +17,8 @@ export class VrMain {
   elapsedTime: number = 0;
   socket = null;
   activeSessions: any[] = [];
+  collarIDSearch: string = '';
+  debouncedSearchHandler: (event: any) => void;
 
   @Element() el: HTMLElement;
 
@@ -34,6 +36,8 @@ export class VrMain {
   @State() environmentLoaded: boolean = false;
   @State() segmentSelectedName: string = 'all';
   @State() viewMode: string = 'live';
+  @State() selectedDate: string | null = null;
+  @State() noMatchingSessions: boolean = false;
 
   @Listen('environmentLoaded')
   async environmentLoadedHandler() {
@@ -50,6 +54,7 @@ export class VrMain {
   }
 
   async componentWillLoad() {
+    this.debouncedSearchHandler = debounce(this.onSearchInput.bind(this), 500);
     this.setupSocket();
   }
 
@@ -85,6 +90,11 @@ export class VrMain {
     }, 500, true));
 
     this.socket.on('ended sessions retrieved', debounce(async endedSessions => {
+      if (endedSessions.length > 0) {
+        this.noMatchingSessions = false;
+      } else {
+        this.noMatchingSessions = true;
+      }
       this.endedSessions = endedSessions;
     }, 500, true));
 
@@ -267,15 +277,6 @@ export class VrMain {
     this.filteredItemList = this.mapInteractableItems(this.interactableItemList);
   }
 
-  async toggleReview() {
-    this.reviewEnabled = !this.reviewEnabled;
-
-    if (this.reviewEnabled === false) {
-      this.toggleMenu();
-      this.activeEnvironment = this.userEnvironment;
-    }
-  }
-
   changeItemList(value) {
     let itemList;
 
@@ -347,12 +348,54 @@ export class VrMain {
     await this.showResetVRAlert();
   }
 
+  onSearchInput(e: any) {
+    const value = e.target.value;
+    this.collarIDSearch = value;
+
+    this.endedSessions = [];
+    this.socket.emit('get ended sessions', {
+      collarID: this.collarIDSearch,
+      date: this.selectedDate
+    });
+  }
+
+  async updateSelectedDate(e: any) {
+    const newDate = e.detail.value;
+    const datePicker = this.el.querySelector('ion-datetime');
+
+    // If the new date is the same as the current selected date, clear it
+    if (this.selectedDate === newDate) {
+      this.selectedDate = null;
+      if (datePicker) {
+        datePicker.reset();
+        const focusedDate: HTMLButtonElement = datePicker.shadowRoot.querySelector(
+            '.calendar-day-wrapper button:focus'
+        );
+
+        if (focusedDate) {
+          focusedDate.blur();
+        }
+      }
+    } else {
+      this.selectedDate = newDate;
+    }
+
+    this.endedSessions = [];
+    this.socket.emit('get ended sessions', {
+      collarID: this.collarIDSearch,
+      date: this.selectedDate
+    });
+  }
+
   async updateViewMode(viewMode) {
     if (viewMode === 'live') {
       this.reviewEnabled = false;
       await this.sessionEnded(this.activeSessions, false);
     } else if (viewMode === 'review') {
-      this.socket.emit('get ended sessions');
+      this.socket.emit('get ended sessions', {
+        collarID: this.collarIDSearch,
+        date: this.selectedDate
+      });
     }
     this.viewMode = viewMode;
   }
@@ -507,12 +550,20 @@ export class VrMain {
             <div class="review-sessions" hidden={this.viewMode === 'live'}>
               <div class="review-search-container">
                 <div class="collar-id-search">
-                  <ion-searchbar placeholder="Enter Collar ID"/>
+                  <ion-searchbar placeholder="Enter Collar ID"
+                                 value={this.collarIDSearch}
+                                 onIonInput={this.debouncedSearchHandler} />
                 </div>
                 <div class="date-picker-and-results">
-                  <ion-datetime presentation="date" color="primary"></ion-datetime>
+                  <ion-datetime
+                      id="datetime"
+                      color="primary"
+                      value={this.selectedDate}
+                      onIonChange={e => this.updateSelectedDate(e)}
+                      presentation="date"
+                  ></ion-datetime>
                   <div class="review-list">
-                    <ion-list inset={true} lines="full">
+                    <ion-list inset={true} lines="full" hidden={this.noMatchingSessions === true}>
                       {this.endedSessions.length > 0 ? this.mapEndedSessions() :
                           Array.from({ length: 8 }).map((_, index) => (
                               <ion-item key={index}>
@@ -521,6 +572,9 @@ export class VrMain {
                           ))
                       }
                     </ion-list>
+                    <div class="no-matching-sessions" hidden={this.noMatchingSessions === false}>
+                      No matching sessions. Please amend your search.
+                    </div>
                   </div>
                 </div>
               </div>

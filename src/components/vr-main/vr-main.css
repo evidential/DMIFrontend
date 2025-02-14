@@ -535,6 +535,10 @@ ion-toast {
     cursor: pointer;
 }
 
+.review-sessions ion-searchbar {
+    --border-radius: 16px;
+}
+
 .date-picker {
     padding: 14px;
 }
@@ -549,6 +553,19 @@ ion-toast {
     height: 350px;
     overflow-y: hidden;
     flex: 1;
+}
+
+.no-matching-sessions {
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    color: #000;
+    border-radius: 16px;
+    margin: 0 0 0 40px;
+    font-size: 24px;
+    font-weight: 700;
 }
 
 .date-picker-and-results .review-list ion-list {
