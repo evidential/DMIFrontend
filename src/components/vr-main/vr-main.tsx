@@ -120,7 +120,7 @@ export class VrMain {
 
     if (this.activeSessions.length <= 1) {
       await this.switchToSession(sessionData, 'live');
-      await this.presentToast(`Observing user session for Collar ID: ${sessionData.collarID}.`);
+      await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
     } else {
       // Check if an alert is already open
       const existingAlert = document.querySelector('ion-alert');
@@ -405,15 +405,15 @@ export class VrMain {
     if (this.environments.length < 1) return [];
     return this.environments.map(environment => {
       let activeEnvironment = '';
-      if (environment.ItemNumber === this.activeEnvironment) activeEnvironment = 'environment-active';
+      if (environment.id === this.activeEnvironment) activeEnvironment = 'environment-container--active';
       return <this.EnvironmentLink environment={environment} activeEnvironment={activeEnvironment}/>;
     });
   }
 
   EnvironmentLink = (props: { environment, activeEnvironment}) => (
-      <div class="environment-container" onClick={() => this.setActiveEnvironment(props.environment.id, false)}>
+      <div class={`environment-container ${props.activeEnvironment}`} onClick={() => this.setActiveEnvironment(props.environment.id, false)}>
         <div class="environment-link-name">{`${this.environments[props.environment.id].name}`}</div>
-        <img class={props.activeEnvironment} src={`../assets/images/${this.environments[props.environment.id].image}`} />
+        <img src={`../assets/images/${this.environments[props.environment.id].image}`} />
       </div>
   );
 
