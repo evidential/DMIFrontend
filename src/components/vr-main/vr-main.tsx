@@ -48,6 +48,27 @@ export class VrMain {
     }
   }
 
+  @Listen('updateNonObservedSessionData')
+  async updateNonObservedSessionDataHandler(event) {
+    const itemData = event.detail.itemData;
+    const item = event.detail.interactableItem;
+    const sessionData = this.activeSessions.find(session => session.ClientId === itemData?.ClientId);
+
+    if (sessionData) {
+      sessionData.interactableItemList = sessionData.interactableItemList.map(interactableItem => {
+        if (interactableItem.ItemNumber === item.ItemNumber) {
+          return {
+            ...interactableItem,
+            IsIgnored: itemData.IsIgnored,
+            IsSeized: itemData.IsSeized,
+            IsTriaged: itemData.IsTriaged
+          };
+        }
+        return interactableItem;
+      });
+    }
+  }
+
   @Listen('itemInteractedWith')
   async itemInteractedWithHandler(event) {
     await this.itemInteractedWith(event.detail);
@@ -341,7 +362,7 @@ export class VrMain {
 
   async resetVRConfirmed() {
     const activeSession = this.activeSessions.find(session => session.collarID === this.activeCollarID);
-    this.socket.emit('reset vr', activeSession);
+    this.socket.emit('end session', activeSession);
   }
 
   async resetVR() {

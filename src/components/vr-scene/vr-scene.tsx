@@ -51,6 +51,7 @@ export class VrScene {
   @Event() environmentLoaded: EventEmitter;
   @Event() itemInteractedWith: EventEmitter;
   @Event() teleportedEnvironment: EventEmitter;
+  @Event() updateNonObservedSessionData: EventEmitter;
 
   @Watch('showSplash')
   async showSplashHandler() {
@@ -96,6 +97,9 @@ export class VrScene {
           } else {
             this.resetItem(itemData);
           }
+        } else {
+          const interactableItem = this.interactableItemList.find(item => item.ItemNumber === itemData.ItemNumber);
+          this.updateNonObservedSessionData.emit({itemData, interactableItem});
         }
       }, 100);
     }, 200, true));

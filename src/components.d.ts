@@ -64,6 +64,7 @@ declare namespace LocalJSX {
         "onEnvironmentLoaded"?: (event: VrSceneCustomEvent<any>) => void;
         "onItemInteractedWith"?: (event: VrSceneCustomEvent<any>) => void;
         "onTeleportedEnvironment"?: (event: VrSceneCustomEvent<any>) => void;
+        "onUpdateNonObservedSessionData"?: (event: VrSceneCustomEvent<any>) => void;
         "reviewEnabled"?: boolean;
         "showSplash"?: boolean;
         "socket"?: any;
