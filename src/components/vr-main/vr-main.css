@@ -577,6 +577,7 @@ ion-toast {
 }
 
 .waiting-image-container {
+    pointer-events: none;
     position: fixed;
     top: 20vh;
     right: 20vw;
