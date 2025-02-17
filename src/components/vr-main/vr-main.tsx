@@ -645,6 +645,10 @@ export class VrMain {
             </div>
           </nav>
 
+          <div class={`waiting-image-container ${this.observingSession === false && this.viewMode === 'live' ? 'waiting-image-container--show' : ''}`}>
+            <img src="../assets/images/vr-headset.png" alt="VR Headset" class="waiting-image" />
+          </div>
+
           <div class="session-info-container" hidden={this.viewMode === 'review' || this.showSplash === true}>
             <div class="session-info">
               {this.activeCollarID ? (
