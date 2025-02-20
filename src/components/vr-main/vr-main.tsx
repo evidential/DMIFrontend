@@ -333,6 +333,27 @@ export class VrMain {
     this.filteredItemList = this.mapInteractableItems(itemList);
   }
 
+  async showDeleteSessionAlert() {
+    return new Promise((resolve) => {
+      const alert = document.createElement('ion-alert');
+      alert.header = 'Confirm Delete';
+      alert.message = 'Are you sure you want to delete this session?';
+      alert.buttons = [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => resolve(false),
+        },
+        {
+          text: 'Delete',
+          handler: () => resolve(true),
+        }
+      ];
+      document.body.appendChild(alert);
+      alert.present();
+    });
+  }
+
   async showResetVRAlert() {
 
     const existingAlert = document.querySelector('ion-alert');
@@ -465,10 +486,38 @@ export class VrMain {
     await actionSheet.present();
   }
 
+  formatDate(dateString: string) {
+    const date = new Date(dateString);
+
+    const datePart = date.toLocaleDateString('en-GB', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+
+    const timePart = date.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return `${datePart} at ${timePart}`;
+  }
+
   async setReviewSessionData(sessionData) {
     this.viewMode = 'live';
     this.reviewEnabled = true;
     await this.switchToSession(sessionData, 'review');
+  }
+
+  async deleteSession(clientId: string) {
+    const confirm = await this.showDeleteSessionAlert();
+
+    if (confirm) {
+      this.endedSessions = [];
+      this.socket.emit('delete ended session', clientId);
+    }
   }
 
   mapEndedSessions() {
@@ -520,6 +569,21 @@ export class VrMain {
         <ion-label>
           Collar ID: {props.item.collarID}
         </ion-label>
+        {props.item.startedAt && (
+            <ion-label class="started-at">
+              {this.formatDate(props.item.startedAt)}
+            </ion-label>
+        )}
+        <ion-button
+            slot="end"
+            fill="clear"
+            color="danger"
+            onClick={async (e) => {
+              e.stopPropagation();
+              await this.deleteSession(props.item.ClientId);
+            }}>
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
       </ion-item>
   );
 
@@ -644,6 +708,10 @@ export class VrMain {
                   <div class="no-items">No {this.segmentSelectedName} items.</div>}
             </div>
           </nav>
+
+          <div class={`waiting-header ${this.observingSession === false && this.viewMode === 'live' ? 'waiting-header--show' : ''}`}>
+            DMI VR App
+          </div>
 
           <div class={`waiting-image-container ${this.observingSession === false && this.viewMode === 'live' ? 'waiting-image-container--show' : ''}`}>
             <img src="../assets/images/vr-headset.png" alt="VR Headset" class="waiting-image" />
