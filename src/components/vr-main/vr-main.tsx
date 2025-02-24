@@ -383,7 +383,7 @@ export class VrMain {
 
   async resetVRConfirmed() {
     const activeSession = this.activeSessions.find(session => session.collarID === this.activeCollarID);
-    this.socket.emit('end session', activeSession);
+    this.socket.emit('end session', JSON.stringify(activeSession));
   }
 
   async resetVR() {
