@@ -564,6 +564,7 @@ ion-toast {
     color: #000;
     border-radius: 16px;
     margin: 0 0 0 40px;
+    padding: 20px;
     font-size: 24px;
     font-weight: 700;
     text-align: center;
@@ -574,4 +575,47 @@ ion-toast {
     margin: 0 0 0 40px;
     height: 100%;
     overflow-y: scroll;
+}
+
+.waiting-header {
+    pointer-events: none;
+    position: fixed;
+    top: 2vh;
+    right: 10vw;
+    left: 10vw;
+    height: 10vh;
+    text-align: center;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+    font-size: 8vh;
+}
+
+.waiting-header--show {
+    opacity: 1;
+}
+
+.waiting-image-container {
+    pointer-events: none;
+    position: fixed;
+    top: 20vh;
+    right: 20vw;
+    left: 20vw;
+    bottom: 20vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+}
+
+.waiting-image-container--show {
+    opacity: 1;
+}
+
+.waiting-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(16px 32px 32px black);
 }
