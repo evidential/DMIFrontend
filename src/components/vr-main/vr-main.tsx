@@ -75,6 +75,7 @@ export class VrMain {
   }
 
   async componentWillLoad() {
+    this.selectedDate = new Date().toISOString();
     this.debouncedSearchHandler = debounce(this.onSearchInput.bind(this), 500);
     this.setupSocket();
   }
