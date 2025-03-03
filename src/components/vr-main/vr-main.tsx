@@ -439,6 +439,8 @@ export class VrMain {
         collarID: this.collarIDSearch,
         date: this.selectedDate
       });
+      this.activeCollarID = '';
+      this.observingSession = false;
     }
     this.viewMode = viewMode;
   }
@@ -519,7 +521,7 @@ export class VrMain {
       this.endedSessions = [];
       this.socket.emit('delete ended session', {
         clientId: sessionItem.ClientId,
-        collarID: sessionItem.collarID,
+        collarID: this.collarIDSearch,
         date: this.selectedDate
       });
     }
