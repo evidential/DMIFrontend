@@ -2,7 +2,7 @@
     "name": "DMIManager",
     "type": "module",
     "private": true,
-    "version": "1.4.3",
+    "version": "1.4.4",
     "description": "DMI Manager",
     "license": "MIT",
     "files": [
