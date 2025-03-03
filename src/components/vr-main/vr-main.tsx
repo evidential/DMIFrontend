@@ -512,12 +512,16 @@ export class VrMain {
     await this.switchToSession(sessionData, 'review');
   }
 
-  async deleteSession(clientId: string) {
+  async deleteSession(sessionItem: any) {
     const confirm = await this.showDeleteSessionAlert();
 
     if (confirm) {
       this.endedSessions = [];
-      this.socket.emit('delete ended session', clientId);
+      this.socket.emit('delete ended session', {
+        clientId: sessionItem.ClientId,
+        collarID: sessionItem.collarID,
+        date: this.selectedDate
+      });
     }
   }
 
@@ -581,7 +585,7 @@ export class VrMain {
             color="danger"
             onClick={async (e) => {
               e.stopPropagation();
-              await this.deleteSession(props.item.ClientId);
+              await this.deleteSession(props.item);
             }}>
           <ion-icon name="trash"></ion-icon>
         </ion-button>
