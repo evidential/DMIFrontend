@@ -363,8 +363,8 @@ export class VrMain {
     }
 
     const alert = await alertController.create({
-      header: `Reset scenario and save for review?`,
-      message: `Are you sure you want to save the session and restart the scenario for collar ID: ${this.activeCollarID} in the VR headset?`,
+      header: `End session and save for review?`,
+      message: `Are you sure you want to end and save the session for collar ID: ${this.activeCollarID} in the VR headset?`,
       buttons: [
         {
           text: 'Cancel',
