@@ -54,7 +54,7 @@
 
 .item-overlay {
     position: absolute;
-    left: 0;
+    left: 60px;
     right: 0;
     top: 0;
     bottom: 0;

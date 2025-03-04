@@ -124,9 +124,9 @@ export class VrMain {
       await this.sessionStarted(sessionData);
     }, 500, true));
 
-    this.socket.on('session ended', debounce(async activeSessions => {
-      await this.sessionEnded(activeSessions, true);
-    }, 500, true));
+    this.socket.on('session ended', debounce(async data => {
+      await this.sessionEnded(data, true);
+    }, 2000, true));
 
     this.socket.on('teleported to area', debounce(async areaData => {
       if (this.reviewEnabled === false) {
@@ -152,48 +152,31 @@ export class VrMain {
 
     if (this.activeSessions.length <= 1) {
       await this.switchToSession(sessionData, 'live');
-      await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
-    } else {
-      const existingAlert = document.querySelector('ion-alert');
-      if (existingAlert) {
-        await existingAlert.dismiss();
-      }
-
-      const alert = await alertController.create({
-        header: `User session started.`,
-        message: `Do you want to observe the user session for Collar ID: ${sessionData.collarID} ?`,
-        buttons: [
-          {
-            text: 'No',
-            role: 'cancel',
-            cssClass: 'dark'
-          },
-          {
-            cssClass: 'dark',
-            text: 'Yes',
-            handler: async () => await this.switchToSession(sessionData, 'live')
-          }
-        ]
-      });
-      await alert.present();
     }
+
+    await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
   }
 
-  async sessionEnded(activeSessions, notify: boolean) {
+  async sessionEnded(data, notify: boolean) {
     if (this.viewMode === 'review') return;
-    this.activeSessions = activeSessions;
-    this.activeEnvironment = 0;
-    this.userEnvironment = 0;
-    this.observingSession = false;
-    this.resetSegment();
-    this.changeItemList('all');
-    const vrScene = this.el.querySelector('vr-scene');
-    if (vrScene) vrScene.resetScene();
+
+    const { activeSession, clientsInSession } = data;
+
     if (notify) {
-      await this.presentToast(`VR session for collar ID: ${this.activeCollarID} ended`);
-      await this.viewLiveSessions();
+      await this.presentToast(`VR session for collar ID: ${activeSession.collarID} ended`);
     }
-    this.activeCollarID = undefined;
+
+    if (activeSession.collarID === this.activeCollarID) {
+      this.activeSessions = clientsInSession;
+      this.activeEnvironment = 0;
+      this.userEnvironment = 0;
+      this.observingSession = false;
+      this.resetSegment();
+      this.changeItemList('all');
+      const vrScene = this.el.querySelector('vr-scene');
+      if (vrScene) vrScene.resetScene();
+      this.activeCollarID = undefined;
+    }
   }
 
   startSplashTimer() {
@@ -433,13 +416,13 @@ export class VrMain {
   async updateViewMode(viewMode) {
     if (viewMode === 'live') {
       this.reviewEnabled = false;
-      await this.sessionEnded(this.activeSessions, false);
+      //await this.sessionEnded({ clientsInSession: this.activeSessions }, false);
     } else if (viewMode === 'review') {
       this.socket.emit('get ended sessions', {
         collarID: this.collarIDSearch,
         date: this.selectedDate
       });
-      this.activeCollarID = '';
+      //this.activeCollarID = '';
       this.observingSession = false;
     }
     this.viewMode = viewMode;
@@ -447,18 +430,13 @@ export class VrMain {
 
   async viewLiveSessions() {
     // Check if an action sheet is already open
-    const existingActionSheet = document.querySelector('ion-action-sheet');
-    if (existingActionSheet) {
-      await existingActionSheet.dismiss();
-    }
-
-    const actionSheet = document.createElement('ion-action-sheet');
+    let actionSheet = document.querySelector('ion-action-sheet');
 
     if (this.activeSessions.length < 1) {
-
       const existingAlert = document.querySelector('ion-alert');
       if (existingAlert) {
         await existingAlert.dismiss();
+        await existingAlert.onDidDismiss();
       }
 
       const alert = document.createElement('ion-alert');
@@ -470,13 +448,13 @@ export class VrMain {
       return await alert.present();
     }
 
-    actionSheet.header = 'Active sessions';
-    actionSheet.buttons = [
+    const buttons = [
       ...this.activeSessions.map(sessionData => ({
         text: `Collar ID: ${sessionData.collarID}`,
         cssClass: sessionData.collarID === this.activeCollarID ? 'active' : '',
-        handler: () => {
-          this.switchToSession(sessionData, 'live');
+        handler: async () => {
+          await this.updateViewMode('live');
+          await this.switchToSession(sessionData, 'live');
         }
       })),
       {
@@ -485,8 +463,19 @@ export class VrMain {
       }
     ];
 
-    document.body.appendChild(actionSheet);
-    await actionSheet.present();
+    if (actionSheet) {
+      // If action sheet exists, update its buttons
+      actionSheet.buttons = buttons;
+      await actionSheet.present();  // Re-present it with the updated buttons
+    } else {
+      // Otherwise, create a new action sheet
+      actionSheet = document.createElement('ion-action-sheet');
+      actionSheet.header = 'Active sessions';
+      actionSheet.buttons = buttons;
+
+      document.body.appendChild(actionSheet);
+      await actionSheet.present();
+    }
   }
 
   formatDate(dateString: string) {
