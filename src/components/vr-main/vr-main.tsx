@@ -609,19 +609,19 @@ export class VrMain {
             <div class="side-menu-wrapper">
               <div class="side-menu">
                 <nav class="sidebar-group">
-                  <ion-button class={this.viewMode === 'live' ? 'active' : ''}
-                              title="View active session" fill="clear"
-                              onClick={() => this.updateViewMode('live')}>
-                    <ion-icon aria-hidden="true" name="videocam-outline"></ion-icon>
-                  </ion-button>
                   <ion-button class={this.viewMode === 'review' === true ? 'active' : ''}
                               title="Review previous sessions" fill="clear"
                               onClick={() => this.updateViewMode('review')}>
                     <ion-icon aria-hidden="true" name="calendar-number-outline"></ion-icon>
                   </ion-button>
+                  <ion-button class={this.viewMode === 'live' ? 'active' : ''}
+                              title="View active session" fill="clear"
+                              onClick={() => this.updateViewMode('live')}>
+                    <ion-icon aria-hidden="true" name="videocam-outline"></ion-icon>
+                  </ion-button>
                 </nav>
 
-                <nav class="sidebar-sub-group" hidden={this.viewMode === 'review'}>
+                <nav class="sidebar-sub-group">
                   <ion-button id="ViewLiveSessions"
                               class={this.viewMode === 'live' && 'active'}
                               title="View live sessions" fill="clear"
