@@ -419,15 +419,17 @@ export class VrMain {
   }
 
   async updateViewMode(viewMode) {
+    if (viewMode === this.viewMode) return;
     if (viewMode === 'live') {
-      this.reviewEnabled = false;
-      if (this.activeCollarID) this.observingSession = true;
+      this.activeCollarID = this.activeClientID?.split('_')[1] || '';
+      if (this.activeClientID) this.observingSession = true;
     } else if (viewMode === 'review') {
       this.socket.emit('get ended sessions', {
         collarID: this.collarIDSearch,
         date: this.selectedDate
       });
       this.observingSession = false;
+      this.activeCollarID = '';
     }
     this.viewMode = viewMode;
   }
@@ -605,12 +607,12 @@ export class VrMain {
               <div class="side-menu">
                 <nav class="sidebar-group">
                   <ion-button class={this.viewMode === 'review' === true ? 'active' : ''}
-                              title="Review previous sessions" fill="clear"
+                              title="Choose previous sessions for review" fill="clear"
                               onClick={() => this.updateViewMode('review')}>
                     <ion-icon aria-hidden="true" name="calendar-number-outline"></ion-icon>
                   </ion-button>
                   <ion-button class={this.viewMode === 'live' ? 'active' : ''}
-                              title="View active session" fill="clear"
+                              title="View session" fill="clear"
                               onClick={() => this.updateViewMode('live')}>
                     <ion-icon aria-hidden="true" name="videocam-outline"></ion-icon>
                   </ion-button>
@@ -619,7 +621,7 @@ export class VrMain {
                 <nav class="sidebar-sub-group">
                   <ion-button id="ViewLiveSessions"
                               class={this.viewMode === 'live' && 'active'}
-                              title="View live sessions" fill="clear"
+                              title="Select live session" fill="clear"
                               onClick={() => this.viewLiveSessions()}>
                     <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
                   </ion-button>

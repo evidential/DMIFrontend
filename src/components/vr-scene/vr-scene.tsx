@@ -231,10 +231,9 @@ export class VrScene {
           // All resources have been loaded
           console.log('All resources loaded');
           setTimeout(() => {
-            const scene: HTMLElement = document.querySelector('a-scene');
             environmentLoadingEl.classList.add('environment-loading--loaded');
             aFrameSceneEl.classList.remove('aframe-scene--loading');
-            scene.offsetHeight;
+            window.dispatchEvent(new window.Event('resize'));
             this.environmentLoaded.emit();
           }, 2000);
         })
