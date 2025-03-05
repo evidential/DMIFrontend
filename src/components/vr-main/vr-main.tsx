@@ -149,13 +149,13 @@ export class VrMain {
   async sessionStarted(sessionData) {
     this.activeSessions = [...this.activeSessions, sessionData];
 
+    await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
+
     if (this.viewMode === 'review' || this.reviewEnabled === true) return;
 
     if (this.activeSessions.length <= 1) {
       await this.switchToSession(sessionData, 'live');
     }
-
-    await this.presentToast(`User session started for Collar ID: ${sessionData.collarID}.`);
   }
 
   async sessionEnded(data, notify: boolean) {
