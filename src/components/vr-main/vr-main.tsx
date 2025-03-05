@@ -569,7 +569,7 @@ export class VrMain {
   );
 
   ReviewableListItem = (props: { item }) => (
-      <ion-item onClick={async () => this.setReviewSessionData(props.item)}>
+      <ion-item onClick={async () => this.setReviewSessionData(props.item)} class={`${props.item.ClientId === this.activeClientID ? 'selected' : ''}`}>
         <ion-label>
           Collar ID: {props.item.collarID}
         </ion-label>

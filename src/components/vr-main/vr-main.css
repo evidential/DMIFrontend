@@ -556,6 +556,11 @@ ion-toast {
     flex: 1;
 }
 
+.review-list ion-item.selected {
+    --background: #2676a6;
+    --color: #fff;
+}
+
 .no-matching-sessions {
     height: 350px;
     display: flex;
