@@ -16,8 +16,8 @@ export class VrMain {
   initialDelay: number = 7000;
   elapsedTime: number = 0;
   socket = null;
-  activeSessions: any[] = [];
   collarIDSearch: string = '';
+  activeSessions: any[] = [];
   debouncedSearchHandler: (event: any) => void;
 
   @Element() el: HTMLElement;
@@ -26,6 +26,7 @@ export class VrMain {
   @State() menuOpen: boolean = false;
   @State() showSplash: boolean = true;
   @State() activeCollarID: string;
+  @State() activeClientID: string;
   @State() activeEnvironment: number = 0;
   @State() userEnvironment: number = 0;
   @State() interactableItemList: any[] = [];
@@ -162,13 +163,13 @@ export class VrMain {
 
     const { activeSession, clientsInSession } = data;
 
+    this.activeSessions = [...clientsInSession];
+
     if (notify) {
       await this.presentToast(`VR session for collar ID: ${activeSession.collarID} ended`);
     }
 
-    console.log(activeSession.collarID, this.activeCollarID);
-    if (activeSession.collarID === this.activeCollarID) {
-      this.activeSessions = clientsInSession;
+    if (activeSession.ClientId === this.activeClientID) {
       this.activeEnvironment = 0;
       this.userEnvironment = 0;
       this.observingSession = false;
@@ -176,6 +177,7 @@ export class VrMain {
       this.changeItemList('all');
       const vrScene = this.el.querySelector('vr-scene');
       if (vrScene) vrScene.resetScene();
+      this.activeClientID = undefined;
       this.activeCollarID = undefined;
     }
   }
@@ -277,6 +279,7 @@ export class VrMain {
       this.reviewEnabled = true;
     }
     this.observingSession = true;
+    this.activeClientID = sessionData.ClientId;
     this.activeCollarID = sessionData.collarID;
     this.activeEnvironment = this.userEnvironment = this.reviewEnabled ? 0 : sessionData.AreaIndex;
     this.interactableItemList = sessionData.interactableItemList;
@@ -437,7 +440,6 @@ export class VrMain {
       const existingAlert = document.querySelector('ion-alert');
       if (existingAlert) {
         await existingAlert.dismiss();
-        await existingAlert.onDidDismiss();
       }
 
       const alert = document.createElement('ion-alert');
