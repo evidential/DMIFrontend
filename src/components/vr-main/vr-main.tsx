@@ -166,6 +166,7 @@ export class VrMain {
       await this.presentToast(`VR session for collar ID: ${activeSession.collarID} ended`);
     }
 
+    console.log(activeSession.collarID, this.activeCollarID);
     if (activeSession.collarID === this.activeCollarID) {
       this.activeSessions = clientsInSession;
       this.activeEnvironment = 0;
@@ -517,9 +518,12 @@ export class VrMain {
   }
 
   mapEndedSessions() {
-    return this.endedSessions.map(item => {
-      return <this.ReviewableListItem item={item} />;
-    });
+    return this.endedSessions
+        .slice()
+        .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
+        .map(item => {
+          return <this.ReviewableListItem item={item} />;
+        });
   }
 
   mapEnvironments() {
