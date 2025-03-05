@@ -406,6 +406,7 @@ export class VrMain {
       this.selectedDate = newDate;
     }
 
+    this.noMatchingSessions = false;
     this.endedSessions = [];
     this.socket.emit('get ended sessions', {
       collarID: this.collarIDSearch,
@@ -416,13 +417,12 @@ export class VrMain {
   async updateViewMode(viewMode) {
     if (viewMode === 'live') {
       this.reviewEnabled = false;
-      //await this.sessionEnded({ clientsInSession: this.activeSessions }, false);
+      if (this.activeCollarID) this.observingSession = true;
     } else if (viewMode === 'review') {
       this.socket.emit('get ended sessions', {
         collarID: this.collarIDSearch,
         date: this.selectedDate
       });
-      //this.activeCollarID = '';
       this.observingSession = false;
     }
     this.viewMode = viewMode;
